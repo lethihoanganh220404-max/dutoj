@@ -38,7 +38,7 @@ services:
       - ./.docker/dev-local/local_settings_docker.py:/code/dmoj/local_settings.py
       - media_data:/media
       - static_data:/static
-      - problem_data:/problems
+      - ./problems:/problems
     ports:
       - "8000:8001"
       - "8001:8001"
@@ -69,7 +69,7 @@ services:
     cap_add:
       - SYS_PTRACE
     volumes:
-      - problem_data:/problems
+      - ./problems:/problems
       - ./.docker/judge/judge.yml:/home/judge/judge.yml:ro
     command: ["run", "-c", "/home/judge/judge.yml", "--no-watchdog", "-p", "9999", "bridge", "judge1", "judge_secret_key_123"]
     depends_on:

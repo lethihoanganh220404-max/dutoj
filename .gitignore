@@ -54,3 +54,6 @@ problem_data/
 .env.*
 !.env.production.example
 !.env.example
+problems/
+data.json
+*.bak
