@@ -57,3 +57,5 @@ problem_data/
 problems/
 data.json
 *.bak
+data_intro.json
+*.cses-backup

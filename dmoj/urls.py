@@ -247,6 +247,14 @@ def paged_list_view(view, name, **kwargs):
 urlpatterns = [
     re_path("", include("pagedown.urls")),
     re_path(
+        r"^basics/$",
+        TitledTemplateView.as_view(
+            template_name="practice/basics.html",
+            title=_("C++ Basics"),
+        ),
+        name="basics_index",
+    ),
+    re_path(
         r"^practice/$",
         TitledTemplateView.as_view(
             template_name="practice/index.html",
