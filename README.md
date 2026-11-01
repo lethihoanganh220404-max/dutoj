@@ -1,4 +1,14 @@
-# DUT Online Judge (DUTOJ)
+# DUT Online Judge
+
+Đồ án cuối kỳ môn Công nghệ phần mềm.
+Nhóm: Lê Thị Hoàng Anh, Hồng Nguyên.
+GVHD: Đào Duy Tuấn. Mentor: Trí Nguyên.
+
+Kế thừa: LQDJudge/online-judge (nền tảng DMOJ),
+qua bản dquangbach/online-judge.
+Phần nhóm phát triển: module AI hỗ trợ soạn đề.
+
+---# DUT Online Judge (DUTOJ)
 
 Hệ thống chấm bài và thi lập trình trực tuyến phục vụ sinh viên môn Kỹ thuật Lập trình (KTLT) - Trường Đại học Bách khoa, Đại học Đà Nẵng.
 
