@@ -122,6 +122,14 @@ def clean(s):
     return s.replace("```python", "").replace("```markdown", "").strip()
 
 
+def ghi_data_json(items_old, items):
+    """Gop bai cu va bai moi roi ghi de len data.json."""
+    merged = {x["code"]: x for x in items_old}
+    merged.update({x["code"]: x for x in items})
+    with open(f"{OUT}/data.json", "w", encoding="utf-8") as f:
+        json.dump(list(merged.values()), f, ensure_ascii=False, indent=2)
+
+
 def main():
     os.makedirs(f"{OUT}/problems", exist_ok=True)
     old = f"{OUT}/data.json"
@@ -212,10 +220,12 @@ def main():
         })
         print("OK (%d test, %d lan hong)" % (len(cases), bad))
 
-    with open(f"{OUT}/data.json", "w", encoding="utf-8") as f:
-        merged = {x["code"]: x for x in items_old}
-        merged.update({x["code"]: x for x in items})
-        json.dump(list(merged.values()), f, ensure_ascii=False, indent=2)
+        # Ghi data.json NGAY sau moi bai, khong doi het vong lap.
+        # Neu chay nua chung bi loi (het han muc API chang han) thi
+        # nhung bai da xong van duoc giu lai.
+        ghi_data_json(items_old, items)
+
+    ghi_data_json(items_old, items)
 
     print("\nXong: %d/%d bai -> %s" % (len(items), len(TOPICS), OUT))
     if failed:
