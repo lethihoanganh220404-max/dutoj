@@ -33,6 +33,12 @@ services:
       dockerfile: .docker/dev-local/Dockerfile
     restart: unless-stopped
     working_dir: /code
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
+      - AI_MODEL=${AI_MODEL:-gemini-3.8-flash}
+      - AI_TIMEOUT=${AI_TIMEOUT:-90}
     volumes:
       - .:/code
       - ./.docker/dev-local/local_settings_docker.py:/code/dmoj/local_settings.py

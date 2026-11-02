@@ -756,3 +756,6 @@ autoreload.autoreload_started.connect(
         os.path.join(os.path.dirname(__file__), "local_settings.py")
     )
 )
+
+# App AI ho tro soan de (nhom tu them)
+INSTALLED_APPS += ("ai_assistant",)

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>AI ho tro soan de</title>
+</head>
+<body style="font-family: sans-serif; max-width: 800px; margin: 40px auto;">
+
+  <h1>AI hỗ trợ soạn đề</h1>
+  <p>Chọn ảnh chụp đề bài, hệ thống sẽ chuyển thành Markdown.</p>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p><input type="file" name="anh_de" accept="image/*"></p>
+    <p><button type="submit">Gửi ảnh</button></p>
+  </form>
+
+  <p style="color:#888; font-size:13px;">
+    Gọi AI mất 10–30 giây. Bấm một lần rồi chờ, mỗi lần tốn một lượt trong hạn mức ngày.
+  </p>
+
+  {% if loi %}
+    <h2 style="color:#c00;">Lỗi</h2>
+    <pre style="background:#fee; border:1px solid #fcc; padding:12px;
+                white-space:pre-wrap; word-break:break-word;">{{ loi }}</pre>
+  {% endif %}
+
+  {% if ket_qua %}
+    <h2>Markdown do AI sinh ra</h2>
+    <p style="color:#888; font-size:13px;">
+      Đọc kỹ trước khi lưu. Chỗ nào ghi UNCLEAR là AI không đọc được, phải tự sửa.
+    </p>
+    <textarea rows="30" style="width:100%; font-family:monospace; font-size:13px;"
+    >{{ ket_qua }}</textarea>
+  {% endif %}
+
+</body>
+</html>

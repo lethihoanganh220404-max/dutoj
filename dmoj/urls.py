@@ -245,6 +245,7 @@ def paged_list_view(view, name, **kwargs):
 
 
 urlpatterns = [
+    re_path(r"^ai/", include("ai_assistant.urls")),
     re_path("", include("pagedown.urls")),
     re_path(
         r"^basics/$",
