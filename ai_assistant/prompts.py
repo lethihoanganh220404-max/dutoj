@@ -57,15 +57,21 @@ SINH_TEST_CASE = """You are helping build test data for a competitive programmin
 PROBLEM STATEMENT:
 %s
 
-Write TWO Python 3 programs. Output them in this exact format, nothing else:
+Write THREE Python 3 programs. Output them in this exact format, nothing else:
 
 ===GENERATOR===
 <python code that prints ONE random valid input to stdout, respecting all constraints>
 ===SOLVER===
 <python code that reads that input from stdin and prints the correct answer to stdout>
+===SOLVER2===
+<a SECOND solver, written independently, using a DIFFERENT approach from the first>
 
 Rules:
-- The solver must be correct, even if slow. Correctness matters, speed does not.
+- Both solvers must be correct, even if slow. Correctness matters, speed does not.
+- SOLVER2 must NOT be a copy of SOLVER with renamed variables. Use a genuinely
+  different method: if SOLVER iterates, SOLVER2 might use a formula, a different
+  data structure, recursion, or brute force over a different quantity.
+  The point is that if one solver misreads the problem, the other probably will not.
 - The generator must use the `random` module and produce varied inputs.
 - The generator must respect EVERY constraint in the statement.
 - No comments, no explanation, no markdown fences.

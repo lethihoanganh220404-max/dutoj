@@ -123,19 +123,32 @@ def sinh_goi_y(problem, bat_buoc_goi_lai=False):
 
 
 def _tach_gen_sol(van_ban):
-    """Tach phan GENERATOR va SOLVER tu cau tra loi cua AI."""
+    """Tach GENERATOR, SOLVER va SOLVER2 tu cau tra loi cua AI."""
     import re
 
     s = van_ban.replace('```python', '').replace('```', '')
+
+    khop = re.search(
+        r'===\s*GENERATOR\s*===(.*?)'
+        r'===\s*SOLVER\s*===(.*?)'
+        r'===\s*SOLVER2\s*===(.*)',
+        s, re.S | re.I,
+    )
+    if khop:
+        return (khop.group(1).strip(), khop.group(2).strip(),
+                khop.group(3).strip())
+
+    # AI chi viet mot solver: van chap nhan, nhung khong kiem chung cheo duoc.
     khop = re.search(
         r'===\s*GENERATOR\s*===(.*?)===\s*SOLVER\s*===(.*)',
         s, re.S | re.I,
     )
-    if not khop:
-        raise LoiLuuBai(
-            'AI khong tra ve dung dinh dang GENERATOR/SOLVER:\n' + s[:400]
-        )
-    return khop.group(1).strip(), khop.group(2).strip()
+    if khop:
+        return khop.group(1).strip(), khop.group(2).strip(), ''
+
+    raise LoiLuuBai(
+        'AI khong tra ve dung dinh dang GENERATOR/SOLVER:\n' + s[:400]
+    )
 
 
 def sinh_test_case(problem, so_test=15):
@@ -153,16 +166,20 @@ def sinh_test_case(problem, so_test=15):
     from .sandbox import LoiChayCode, chay_python
 
     van_ban = goi_llm(SINH_TEST_CASE % problem.description)
-    gen_code, sol_code = _tach_gen_sol(van_ban)
+    gen_code, sol_code, sol2_code = _tach_gen_sol(van_ban)
 
     cac_test = []
     so_lan_hong = 0
+    so_lan_lech = 0      # hai solver cho ket qua khac nhau
 
     with tempfile.TemporaryDirectory() as tam:
         duong_gen = os.path.join(tam, 'gen.py')
         duong_sol = os.path.join(tam, 'sol.py')
+        duong_sol2 = os.path.join(tam, 'sol2.py')
         open(duong_gen, 'w').write(gen_code)
         open(duong_sol, 'w').write(sol_code)
+        if sol2_code:
+            open(duong_sol2, 'w').write(sol2_code)
 
         # Chia test theo kich thuoc: nho (bien), vua, lon (sat gioi han tren).
         # Test lon moi la thu loc duoc loi giai cham.
@@ -186,10 +203,32 @@ def sinh_test_case(problem, so_test=15):
                     if not dau_ra.strip():
                         so_lan_hong += 1
                         continue
+
+                    # Kiem chung cheo: chay solver thu hai, phai ra giong nhau.
+                    # Neu lech thi mot trong hai hieu sai de - bo test nay.
+                    if sol2_code:
+                        try:
+                            dau_ra2 = chay_python(duong_sol2, dau_vao=dau_vao,
+                                                  thu_muc=tam, giay=giay)
+                        except LoiChayCode:
+                            so_lan_hong += 1
+                            continue
+                        if dau_ra.split() != dau_ra2.split():
+                            so_lan_lech += 1
+                            continue
+
                     cac_test.append((dau_vao, dau_ra))
                     break
                 except LoiChayCode:
                     so_lan_hong += 1
+
+    if so_lan_lech:
+        raise LoiLuuBai(
+            'Hai loi giai tham chieu cho ket qua KHAC NHAU tren %d lan thu. '
+            'Nghia la it nhat mot trong hai hieu sai de bai, khong the tin '
+            'test case sinh ra. Hay sinh lai, hoac kiem tra lai de bai.'
+            % so_lan_lech
+        )
 
     if len(cac_test) < 5:
         raise LoiLuuBai(
@@ -203,7 +242,10 @@ def sinh_test_case(problem, so_test=15):
         problem=problem,
         defaults={
             'generator': gen_code,
-            'solver': sol_code,
+            'solver': sol_code + (
+                '\n\n# ===== LOI GIAI THAM CHIEU THU HAI (kiem chung cheo) =====\n'
+                + sol2_code if sol2_code else ''
+            ),
             'du_lieu': json.dumps(cac_test),
             'so_test': len(cac_test),
             'so_lan_hong': so_lan_hong,
