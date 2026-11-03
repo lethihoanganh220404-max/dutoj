@@ -283,6 +283,12 @@
 
   {% if request.user.is_superuser %}
     <div class="link-row">
+      <a href="{{ url('ai_assistant:goi_y', problem.code) }}">
+        <i class="fas fa-lightbulb"></i><span> Gợi ý AI</span>
+      </a>
+    </div>
+
+    <div class="link-row">
       <a href="{{ url('problem_clone', problem.code) }}">
         <i class="fas fa-clone"></i><span> {{ _('Clone problem') }}</span>
       </a>

@@ -76,16 +76,33 @@ def xem_goi_y(request, ma_bai):
     bai = get_object_or_404(Problem, code=ma_bai)
     ctx = {'bai': bai}
 
+    ctx['goi_y'] = GoiY.objects.filter(problem=bai).first()
+
     if request.method == 'POST':
+        from .tasks import task_sinh_goi_y
         lam_lai = request.POST.get('lam_lai') == '1'
-        try:
-            goi_y, da_goi_api = sinh_goi_y(bai, bat_buoc_goi_lai=lam_lai)
-            ctx['goi_y'] = goi_y
-            ctx['da_goi_api'] = da_goi_api
-        except (LoiGoiLLM, LoiLuuBai, ValueError) as e:
-            ctx['loi'] = str(e)
-            ctx['goi_y'] = GoiY.objects.filter(problem=bai).first()
-    else:
-        ctx['goi_y'] = GoiY.objects.filter(problem=bai).first()
+        ket = task_sinh_goi_y.delay(bai.id, lam_lai)
+        ctx['task_id'] = ket.id
+        ctx['dang_chay'] = True
 
     return render(request, 'ai_assistant/goi_y.html', ctx)
+
+
+@staff_member_required
+def trang_thai_task(request, task_id):
+    """Trang web hoi lai moi vai giay: viec xong chua?"""
+    from celery.result import AsyncResult
+    from django.http import JsonResponse
+
+    ket = AsyncResult(task_id)
+    du_lieu = {'trang_thai': ket.state}
+
+    if ket.successful():
+        du_lieu['xong'] = True
+    elif ket.failed():
+        du_lieu['xong'] = True
+        du_lieu['loi'] = str(ket.result)[:600]
+    else:
+        du_lieu['xong'] = False
+
+    return JsonResponse(du_lieu)

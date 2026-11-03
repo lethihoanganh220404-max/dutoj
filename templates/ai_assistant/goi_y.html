@@ -32,6 +32,11 @@
     .ghi-chu { color: #888; font-size: 13px; }
     button { padding: 6px 14px; }
     .nguon { background: #eef; padding: 8px 12px; font-size: 13px; }
+    .an { display: none; }
+    .mo-them { margin: 16px 0; }
+    .nut-mo { padding: 8px 16px; background: #fff; border: 1px solid #bbb;
+              border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .nut-mo:hover { background: #f0f0f0; }
   </style>
 </head>
 <body>
@@ -50,16 +55,59 @@
     <p class="nguon">Lấy từ database, không tốn lượt API.</p>
   {% endif %}
 
+  {% if dang_chay %}
+    <p class="nguon" id="dang-chay">
+      Đang gọi AI, mất 10–60 giây. Trang sẽ tự cập nhật, không cần bấm lại.
+      <span id="cham">...</span>
+    </p>
+    <script>
+      (function () {
+        var n = 0;
+        var cham = document.getElementById('cham');
+        setInterval(function () {
+          n = (n + 1) % 4;
+          cham.textContent = '.'.repeat(n);
+        }, 500);
+
+        function hoi() {
+          fetch('/ai/task/{{ task_id }}/')
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (d.xong) {
+                location.href = location.pathname;
+              } else {
+                setTimeout(hoi, 3000);
+              }
+            })
+            .catch(function () { setTimeout(hoi, 5000); });
+        }
+        setTimeout(hoi, 3000);
+      })();
+    </script>
+  {% endif %}
+
   {% if goi_y %}
     <div class="muc m1">
       <h3>Mức 1 — Hướng tiếp cận</h3>
       <div class="noi-dung" data-md="{{ goi_y.muc1 }}"></div>
     </div>
-    <div class="muc m2">
+    <div class="mo-them">
+      <button type="button" class="nut-mo" data-mo="muc-2">
+        Vẫn chưa ra? Mở mức 2 — Thuật toán
+      </button>
+    </div>
+    <div class="muc m2 an" id="muc-2">
       <h3>Mức 2 — Thuật toán</h3>
       <div class="noi-dung" data-md="{{ goi_y.muc2 }}"></div>
     </div>
-    <div class="muc m3">
+
+    <div class="mo-them an" id="nut-3">
+      <button type="button" class="nut-mo" data-mo="muc-3">
+        Mở mức 3 — Lời giải chi tiết
+      </button>
+      <p class="ghi-chu">Mức này giải gần hết bài. Chỉ mở khi đã thử thật sự.</p>
+    </div>
+    <div class="muc m3 an" id="muc-3">
       <h3>Mức 3 — Lời giải chi tiết</h3>
       <div class="noi-dung" data-md="{{ goi_y.muc3 }}"></div>
     </div>
@@ -84,6 +132,17 @@
 
   <script>
     // Doi KaTeX nap xong roi moi ve Markdown va cong thuc.
+    // Mo dan tung muc mot: doc muc 1, nghi, bi moi mo tiep.
+    document.addEventListener('click', function (e) {
+      var nut = e.target.closest('.nut-mo');
+      if (!nut) return;
+      document.getElementById(nut.dataset.mo).classList.remove('an');
+      nut.parentElement.classList.add('an');
+      if (nut.dataset.mo === 'muc-2') {
+        document.getElementById('nut-3').classList.remove('an');
+      }
+    });
+
     window.addEventListener('load', function () {
       document.querySelectorAll('.noi-dung').forEach(function (el) {
         el.innerHTML = marked.parse(el.dataset.md || '');
