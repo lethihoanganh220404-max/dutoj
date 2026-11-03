@@ -20,6 +20,9 @@
             background: #fff; cursor: pointer; font-size: 14px; }
   .ai-nut-duyet { background: #2a7; color: #fff; border-color: #2a7; }
   .ai-nut-bo { border-color: #c66; color: #c44; }
+  .ai-canhbao { background: #fdeaea; border-left: 4px solid #d44;
+                padding: 14px 18px; border-radius: 0 4px 4px 0;
+                margin: 16px 0; }
   .ai-hop pre { background: #2d2d2d; color: #eee; padding: 12px;
                 overflow-x: auto; border-radius: 4px; font-size: 12px;
                 max-height: 320px; }
@@ -95,6 +98,18 @@
         {% if nhap.so_lan_hong %}(hỏng {{ nhap.so_lan_hong }} lần){% endif %}.
         Chưa ghi vào máy chấm.
       </p>
+      {% if canh_bao_da_dap_an %}
+        <div class="ai-canhbao">
+          <strong>Cảnh báo: bài này có thể có nhiều đáp án đúng.</strong><br>
+          AI nhận định: <em>{{ nhap.da_dap_an }}</em>
+          <p style="margin-bottom:0;">
+            Với bài như vậy, máy chấm so sánh văn bản sẽ báo sai cho những
+            lời giải đúng nhưng chọn đáp án khác. Không nên dùng bộ test này
+            khi chưa có special judge.
+          </p>
+        </div>
+      {% endif %}
+
       <p class="ai-nho">
         Việc cần kiểm: dữ liệu vào có đúng ràng buộc của đề không?
         Kết quả ra có hợp lý không? Code giải có đúng ý đề không?

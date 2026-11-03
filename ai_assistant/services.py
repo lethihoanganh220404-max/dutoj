@@ -128,6 +128,13 @@ def _tach_gen_sol(van_ban):
 
     s = van_ban.replace('```python', '').replace('```', '')
 
+    # Co phai bai da dap an khong? AI tu bao.
+    da_dap_an = ''
+    k_dd = re.search(r'===\s*DA_DAP_AN\s*===(.*?)===\s*GENERATOR\s*===',
+                     s, re.S | re.I)
+    if k_dd:
+        da_dap_an = k_dd.group(1).strip()
+
     khop = re.search(
         r'===\s*GENERATOR\s*===(.*?)'
         r'===\s*SOLVER\s*===(.*?)'
@@ -136,7 +143,7 @@ def _tach_gen_sol(van_ban):
     )
     if khop:
         return (khop.group(1).strip(), khop.group(2).strip(),
-                khop.group(3).strip())
+                khop.group(3).strip(), da_dap_an)
 
     # AI chi viet mot solver: van chap nhan, nhung khong kiem chung cheo duoc.
     khop = re.search(
@@ -144,7 +151,7 @@ def _tach_gen_sol(van_ban):
         s, re.S | re.I,
     )
     if khop:
-        return khop.group(1).strip(), khop.group(2).strip(), ''
+        return khop.group(1).strip(), khop.group(2).strip(), '', da_dap_an
 
     raise LoiLuuBai(
         'AI khong tra ve dung dinh dang GENERATOR/SOLVER:\n' + s[:400]
@@ -166,7 +173,7 @@ def sinh_test_case(problem, so_test=15):
     from .sandbox import LoiChayCode, chay_python
 
     van_ban = goi_llm(SINH_TEST_CASE % problem.description)
-    gen_code, sol_code, sol2_code = _tach_gen_sol(van_ban)
+    gen_code, sol_code, sol2_code, da_dap_an = _tach_gen_sol(van_ban)
 
     cac_test = []
     so_lan_hong = 0
@@ -249,6 +256,7 @@ def sinh_test_case(problem, so_test=15):
             'du_lieu': json.dumps(cac_test),
             'so_test': len(cac_test),
             'so_lan_hong': so_lan_hong,
+            'da_dap_an': da_dap_an,
             'da_duyet': False,
         },
     )

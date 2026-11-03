@@ -140,6 +140,7 @@ def sinh_test(request, ma_bai):
 
     if nhap:
         import json
+        ctx['canh_bao_da_dap_an'] = 'YES' in (nhap.da_dap_an or '').upper()
         cac_test = json.loads(nhap.du_lieu or '[]')
         ctx['test_mau'] = [
             {'stt': i + 1, 'vao': v[:500], 'ra': r[:300]}

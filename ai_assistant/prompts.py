@@ -57,8 +57,14 @@ SINH_TEST_CASE = """You are helping build test data for a competitive programmin
 PROBLEM STATEMENT:
 %s
 
-Write THREE Python 3 programs. Output them in this exact format, nothing else:
+First, answer one question about the problem, then write three programs.
+Output everything in this exact format, nothing else:
 
+===DA_DAP_AN===
+<Write YES if a valid input can have MORE THAN ONE correct output - for example
+ the statement says "print any valid answer", or asks for any arrangement,
+ any path, any assignment. Write NO if every input has exactly one correct
+ output. Then on the next line, one sentence saying why.>
 ===GENERATOR===
 <python code that prints ONE random valid input to stdout, respecting all constraints>
 ===SOLVER===

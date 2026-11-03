@@ -45,6 +45,8 @@ class TestCaseNhap(models.Model):
     so_lan_hong = models.PositiveIntegerField('so lan chay hong', default=0)
     da_duyet = models.BooleanField('da duyet va ghi ra /problems', default=False)
 
+    da_dap_an = models.TextField('AI bao bai co nhieu dap an dung khong',
+                                blank=True)
     ngay_tao = models.DateTimeField('ngay tao', auto_now_add=True)
 
     class Meta:
