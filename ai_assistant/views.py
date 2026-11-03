@@ -61,3 +61,31 @@ def upload_image(request):
             ctx['loi'] = 'Thoi gian / bo nho / diem phai la so.'
 
     return render(request, 'ai_assistant/upload.html', ctx)
+
+
+@staff_member_required
+def xem_goi_y(request, ma_bai):
+    """Xem hoac sinh goi y 3 muc cho mot bai."""
+    from django.shortcuts import get_object_or_404
+
+    from judge.models import Problem
+
+    from .models import GoiY
+    from .services import sinh_goi_y
+
+    bai = get_object_or_404(Problem, code=ma_bai)
+    ctx = {'bai': bai}
+
+    if request.method == 'POST':
+        lam_lai = request.POST.get('lam_lai') == '1'
+        try:
+            goi_y, da_goi_api = sinh_goi_y(bai, bat_buoc_goi_lai=lam_lai)
+            ctx['goi_y'] = goi_y
+            ctx['da_goi_api'] = da_goi_api
+        except (LoiGoiLLM, LoiLuuBai, ValueError) as e:
+            ctx['loi'] = str(e)
+            ctx['goi_y'] = GoiY.objects.filter(problem=bai).first()
+    else:
+        ctx['goi_y'] = GoiY.objects.filter(problem=bai).first()
+
+    return render(request, 'ai_assistant/goi_y.html', ctx)

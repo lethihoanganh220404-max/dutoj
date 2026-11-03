@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Goi y AI</title>
+  <style>
+    body { font-family: sans-serif; max-width: 860px; margin: 40px auto; padding: 0 16px; }
+    .muc { background: #f7f7f7; border-left: 4px solid #888;
+           padding: 12px 16px; margin: 16px 0; white-space: pre-wrap; }
+    .muc h3 { margin-top: 0; }
+    .m1 { border-left-color: #4a4; }
+    .m2 { border-left-color: #c90; }
+    .m3 { border-left-color: #c44; }
+    .loi { background: #fee; border: 1px solid #fcc; padding: 12px;
+           white-space: pre-wrap; }
+    .ghi-chu { color: #888; font-size: 13px; }
+    button { padding: 6px 14px; }
+  </style>
+</head>
+<body>
+
+  <h1>Gợi ý AI</h1>
+  <p>Bài: <strong>{{ bai.name }}</strong> ({{ bai.code }})</p>
+
+  {% if loi %}
+    <pre class="loi">{{ loi }}</pre>
+  {% endif %}
+
+  {% if da_goi_api %}
+    <p class="ghi-chu">Vừa gọi AI — đã tốn một lượt. Kết quả đã lưu vào database.</p>
+  {% elif goi_y %}
+    <p class="ghi-chu">Lấy từ database, không tốn lượt API.</p>
+  {% endif %}
+
+  {% if goi_y %}
+    <div class="muc m1">
+      <h3>Mức 1 — Hướng tiếp cận</h3>
+      {{ goi_y.muc1 }}
+    </div>
+    <div class="muc m2">
+      <h3>Mức 2 — Thuật toán</h3>
+      {{ goi_y.muc2 }}
+    </div>
+    <div class="muc m3">
+      <h3>Mức 3 — Lời giải chi tiết</h3>
+      {{ goi_y.muc3 }}
+    </div>
+    <p class="ghi-chu">
+      Mô hình: {{ goi_y.mo_hinh }} — tạo lúc {{ goi_y.ngay_tao }}
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="lam_lai" value="1">
+      <button type="submit">Sinh lại (tốn một lượt API)</button>
+    </form>
+  {% else %}
+    <p>Bài này chưa có gợi ý.</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit">Sinh gợi ý bằng AI</button>
+    </form>
+    <p class="ghi-chu">Mất 10–60 giây.</p>
+  {% endif %}
+
+</body>
+</html>
