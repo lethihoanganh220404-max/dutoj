@@ -24,11 +24,12 @@ def _dat_gioi_han():
     resource.setrlimit(resource.RLIMIT_NPROC, (64, 64))
 
 
-def chay_python(duong_dan, dau_vao='', thu_muc=None, giay=None):
+def chay_python(duong_dan, dau_vao='', thu_muc=None, giay=None,
+                tham_so=None):
     """Chay mot file Python, tra ve stdout. Nem LoiChayCode neu hong."""
     try:
         kq = subprocess.run(
-            ['python3', duong_dan],
+            ['python3', duong_dan] + list(tham_so or []),
             input=dau_vao,
             capture_output=True,
             text=True,

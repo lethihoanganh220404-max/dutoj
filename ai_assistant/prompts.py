@@ -68,6 +68,18 @@ Rules:
 - The solver must be correct, even if slow. Correctness matters, speed does not.
 - The generator must use the `random` module and produce varied inputs.
 - The generator must respect EVERY constraint in the statement.
-- Keep generated inputs small enough that a slow solver finishes in a second.
 - No comments, no explanation, no markdown fences.
+
+IMPORTANT - the generator must read one argument from the command line:
+
+    import sys
+    muc = sys.argv[1] if len(sys.argv) > 1 else 'vua'
+
+  'nho'  -> smallest valid inputs: edge cases, minimum sizes, empty-ish cases,
+            all-same values, extreme values allowed by the constraints
+  'vua'  -> medium random inputs
+  'lon'  -> inputs AT the upper limit of every size constraint in the statement
+
+  For 'lon', use the true maximum the statement allows, not a smaller safe number.
+  The solver may be slow on these; that is acceptable and expected.
 """

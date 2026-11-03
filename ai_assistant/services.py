@@ -164,22 +164,32 @@ def sinh_test_case(problem, so_test=15):
         open(duong_gen, 'w').write(gen_code)
         open(duong_sol, 'w').write(sol_code)
 
-        # Chay nhieu hon so can, vi mot so lan se hong.
-        for _ in range(so_test * 2):
-            if len(cac_test) >= so_test:
-                break
-            try:
-                dau_vao = chay_python(duong_gen, thu_muc=tam)
-                if not dau_vao.strip():
+        # Chia test theo kich thuoc: nho (bien), vua, lon (sat gioi han tren).
+        # Test lon moi la thu loc duoc loi giai cham.
+        so_nho = max(2, so_test // 5)
+        so_lon = max(2, so_test // 5)
+        so_vua = so_test - so_nho - so_lon
+        ke_hoach = (['nho'] * so_nho + ['vua'] * so_vua + ['lon'] * so_lon)
+
+        for muc in ke_hoach:
+            # Test lon duoc chay lau hon vi solver Python cham.
+            giay = 30 if muc == 'lon' else 10
+            for _ in range(3):          # moi test thu toi da 3 lan
+                try:
+                    dau_vao = chay_python(duong_gen, thu_muc=tam,
+                                          tham_so=[muc], giay=giay)
+                    if not dau_vao.strip():
+                        so_lan_hong += 1
+                        continue
+                    dau_ra = chay_python(duong_sol, dau_vao=dau_vao,
+                                         thu_muc=tam, giay=giay)
+                    if not dau_ra.strip():
+                        so_lan_hong += 1
+                        continue
+                    cac_test.append((dau_vao, dau_ra))
+                    break
+                except LoiChayCode:
                     so_lan_hong += 1
-                    continue
-                dau_ra = chay_python(duong_sol, dau_vao=dau_vao, thu_muc=tam)
-                if not dau_ra.strip():
-                    so_lan_hong += 1
-                    continue
-                cac_test.append((dau_vao, dau_ra))
-            except LoiChayCode:
-                so_lan_hong += 1
 
     if len(cac_test) < 5:
         raise LoiLuuBai(
