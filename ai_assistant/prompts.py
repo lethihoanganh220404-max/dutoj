@@ -50,3 +50,24 @@ The three values are Markdown strings. Escape newlines inside them as \\n.
 --- PROBLEM STATEMENT ---
 %s
 """
+
+
+SINH_TEST_CASE = """You are helping build test data for a competitive programming judge.
+
+PROBLEM STATEMENT:
+%s
+
+Write TWO Python 3 programs. Output them in this exact format, nothing else:
+
+===GENERATOR===
+<python code that prints ONE random valid input to stdout, respecting all constraints>
+===SOLVER===
+<python code that reads that input from stdin and prints the correct answer to stdout>
+
+Rules:
+- The solver must be correct, even if slow. Correctness matters, speed does not.
+- The generator must use the `random` module and produce varied inputs.
+- The generator must respect EVERY constraint in the statement.
+- Keep generated inputs small enough that a slow solver finishes in a second.
+- No comments, no explanation, no markdown fences.
+"""

@@ -119,3 +119,103 @@ def sinh_goi_y(problem, bat_buoc_goi_lai=False):
         },
     )
     return goi_y, True   # True = vua goi API
+
+
+def _tach_gen_sol(van_ban):
+    """Tach phan GENERATOR va SOLVER tu cau tra loi cua AI."""
+    import re
+
+    s = van_ban.replace('```python', '').replace('```', '')
+    khop = re.search(
+        r'===\s*GENERATOR\s*===(.*?)===\s*SOLVER\s*===(.*)',
+        s, re.S | re.I,
+    )
+    if not khop:
+        raise LoiLuuBai(
+            'AI khong tra ve dung dinh dang GENERATOR/SOLVER:\n' + s[:400]
+        )
+    return khop.group(1).strip(), khop.group(2).strip()
+
+
+def sinh_test_case(problem, so_test=15):
+    """Sinh test case that: AI viet generator + solver, MAY chay de lay output.
+
+    Khong bao AI tu nghi cap input/output - no tinh nham. Chi bao no viet
+    code, roi chay code do de lay ket qua dung.
+    """
+    import os
+    import tempfile
+
+    from django.conf import settings
+
+    from .llm_client import goi_llm
+    from .prompts import SINH_TEST_CASE
+    from .sandbox import LoiChayCode, chay_python
+
+    van_ban = goi_llm(SINH_TEST_CASE % problem.description)
+    gen_code, sol_code = _tach_gen_sol(van_ban)
+
+    cac_test = []
+    so_lan_hong = 0
+
+    with tempfile.TemporaryDirectory() as tam:
+        duong_gen = os.path.join(tam, 'gen.py')
+        duong_sol = os.path.join(tam, 'sol.py')
+        open(duong_gen, 'w').write(gen_code)
+        open(duong_sol, 'w').write(sol_code)
+
+        # Chay nhieu hon so can, vi mot so lan se hong.
+        for _ in range(so_test * 2):
+            if len(cac_test) >= so_test:
+                break
+            try:
+                dau_vao = chay_python(duong_gen, thu_muc=tam)
+                if not dau_vao.strip():
+                    so_lan_hong += 1
+                    continue
+                dau_ra = chay_python(duong_sol, dau_vao=dau_vao, thu_muc=tam)
+                if not dau_ra.strip():
+                    so_lan_hong += 1
+                    continue
+                cac_test.append((dau_vao, dau_ra))
+            except LoiChayCode:
+                so_lan_hong += 1
+
+    if len(cac_test) < 5:
+        raise LoiLuuBai(
+            'Chi sinh duoc %d test hop le (hong %d lan). '
+            'Code AI viet co van de - thu sinh lai.'
+            % (len(cac_test), so_lan_hong)
+        )
+
+    # Ghi ra thu muc problem_data theo dung chuan DMOJ.
+    goc = getattr(settings, 'DMOJ_PROBLEM_DATA_ROOT', '/problems')
+    thu_muc_bai = os.path.join(str(goc), problem.code)
+    os.makedirs(thu_muc_bai, exist_ok=True)
+
+    n = len(cac_test)
+    chia, du = divmod(100, n)
+
+    for k, (dau_vao, dau_ra) in enumerate(cac_test, start=1):
+        open(os.path.join(thu_muc_bai, '%02d.in' % k), 'w').write(dau_vao)
+        open(os.path.join(thu_muc_bai, '%02d.out' % k), 'w').write(dau_ra)
+
+    with open(os.path.join(thu_muc_bai, 'init.yml'), 'w') as f:
+        f.write('test_cases:\n')
+        for k in range(1, n + 1):
+            diem = chia + (1 if k <= du else 0)
+            f.write('- in: %02d.in\n  out: %02d.out\n  points: %d\n'
+                    % (k, k, diem))
+
+    # Luu lai code de sau nay sinh them test duoc.
+    open(os.path.join(thu_muc_bai, '_generator.py'), 'w').write(gen_code)
+    open(os.path.join(thu_muc_bai, '_solver.py'), 'w').write(sol_code)
+
+    return {
+        'so_test': n,
+        'so_lan_hong': so_lan_hong,
+        'thu_muc': thu_muc_bai,
+        'test_mau': cac_test[:3],
+        'generator': gen_code,
+        'solver': sol_code,
+    }
