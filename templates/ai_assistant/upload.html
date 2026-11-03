@@ -3,35 +3,89 @@
 <head>
   <meta charset="utf-8">
   <title>AI ho tro soan de</title>
+  <style>
+    body { font-family: sans-serif; max-width: 860px; margin: 40px auto; padding: 0 16px; }
+    label { display: inline-block; width: 150px; }
+    input[type=text] { width: 260px; padding: 4px; }
+    .hop { background: #f7f7f7; border: 1px solid #ddd;
+           padding: 16px; margin: 20px 0; }
+    .loi { background: #fee; border: 1px solid #fcc; padding: 12px;
+           white-space: pre-wrap; word-break: break-word; }
+    .ok  { background: #efe; border: 1px solid #cec; padding: 12px; }
+    .ghi-chu { color: #888; font-size: 13px; }
+    button { padding: 6px 14px; }
+  </style>
 </head>
-<body style="font-family: sans-serif; max-width: 800px; margin: 40px auto;">
+<body>
 
   <h1>AI hỗ trợ soạn đề</h1>
-  <p>Chọn ảnh chụp đề bài, hệ thống sẽ chuyển thành Markdown.</p>
-
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <p><input type="file" name="anh_de" accept="image/*"></p>
-    <p><button type="submit">Gửi ảnh</button></p>
-  </form>
-
-  <p style="color:#888; font-size:13px;">
-    Gọi AI mất 10–30 giây. Bấm một lần rồi chờ, mỗi lần tốn một lượt trong hạn mức ngày.
-  </p>
 
   {% if loi %}
     <h2 style="color:#c00;">Lỗi</h2>
-    <pre style="background:#fee; border:1px solid #fcc; padding:12px;
-                white-space:pre-wrap; word-break:break-word;">{{ loi }}</pre>
+    <pre class="loi">{{ loi }}</pre>
   {% endif %}
 
-  {% if ket_qua %}
-    <h2>Markdown do AI sinh ra</h2>
-    <p style="color:#888; font-size:13px;">
-      Đọc kỹ trước khi lưu. Chỗ nào ghi UNCLEAR là AI không đọc được, phải tự sửa.
+  {% if da_luu %}
+    <p class="ok">
+      Đã lưu bài <strong>{{ da_luu }}</strong> vào database.
+      <a href="/problem/{{ da_luu }}">Xem bài</a> |
+      <a href="/admin/judge/problem/">Quản lý bài</a><br>
+      <span class="ghi-chu">Bài đang ẩn vì chưa có test case.
+      Thêm test case rồi mới bật công khai.</span>
     </p>
-    <textarea rows="30" style="width:100%; font-family:monospace; font-size:13px;"
-    >{{ ket_qua }}</textarea>
+  {% endif %}
+
+  <div class="hop">
+    <h3>Bước 1 — Đọc ảnh đề</h3>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="hanh_dong" value="doc_anh">
+      <p><input type="file" name="anh_de" accept="image/*"></p>
+      <p><button type="submit">Gửi ảnh cho AI</button></p>
+    </form>
+    <p class="ghi-chu">Mất 10–60 giây. Bấm một lần rồi chờ.</p>
+  </div>
+
+  {% if ket_qua %}
+  <div class="hop">
+    <h3>Bước 2 — Duyệt rồi lưu</h3>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="hanh_dong" value="luu_db">
+
+      <p>
+        <label>Mã bài</label>
+        <input type="text" name="ma_bai" value="{{ ma_bai|default('') }}"
+               placeholder="vd: dut_sum_even" required>
+      </p>
+      <p>
+        <label>Tên bài</label>
+        <input type="text" name="ten_bai" value="{{ ten_bai|default('') }}" required>
+      </p>
+      <p>
+        <label>Thời gian (giây)</label>
+        <input type="text" name="time_limit" value="{{ time_limit }}">
+      </p>
+      <p>
+        <label>Bộ nhớ (KB)</label>
+        <input type="text" name="memory_limit" value="{{ memory_limit }}">
+      </p>
+      <p>
+        <label>Điểm</label>
+        <input type="text" name="points" value="{{ points }}">
+      </p>
+
+      <p class="ghi-chu">
+        Đọc kỹ Markdown bên dưới trước khi lưu. Sửa trực tiếp được.
+        Chỗ nào ghi UNCLEAR là AI không đọc được.
+      </p>
+      <textarea name="ket_qua" rows="26"
+                style="width:100%; font-family:monospace; font-size:13px;"
+      >{{ ket_qua }}</textarea>
+
+      <p><button type="submit">Lưu vào database</button></p>
+    </form>
+  </div>
   {% endif %}
 
 </body>
