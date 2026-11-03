@@ -135,6 +135,21 @@ def _tach_gen_sol(van_ban):
     if k_dd:
         da_dap_an = k_dd.group(1).strip()
 
+    # Co du ca 4 phan: generator, solver, solver2, checker
+    khop = re.search(
+        r'===\s*GENERATOR\s*===(.*?)'
+        r'===\s*SOLVER\s*===(.*?)'
+        r'===\s*SOLVER2\s*===(.*?)'
+        r'===\s*CHECKER\s*===(.*)',
+        s, re.S | re.I,
+    )
+    if khop:
+        checker = khop.group(4).strip()
+        if 'def check(' not in checker:
+            checker = ''        # AI viet "KHONG CAN" hoac bo trong
+        return (khop.group(1).strip(), khop.group(2).strip(),
+                khop.group(3).strip(), da_dap_an, checker)
+
     khop = re.search(
         r'===\s*GENERATOR\s*===(.*?)'
         r'===\s*SOLVER\s*===(.*?)'
@@ -143,7 +158,7 @@ def _tach_gen_sol(van_ban):
     )
     if khop:
         return (khop.group(1).strip(), khop.group(2).strip(),
-                khop.group(3).strip(), da_dap_an)
+                khop.group(3).strip(), da_dap_an, '')
 
     # AI chi viet mot solver: van chap nhan, nhung khong kiem chung cheo duoc.
     khop = re.search(
@@ -151,7 +166,7 @@ def _tach_gen_sol(van_ban):
         s, re.S | re.I,
     )
     if khop:
-        return khop.group(1).strip(), khop.group(2).strip(), '', da_dap_an
+        return khop.group(1).strip(), khop.group(2).strip(), '', da_dap_an, ''
 
     raise LoiLuuBai(
         'AI khong tra ve dung dinh dang GENERATOR/SOLVER:\n' + s[:400]
@@ -173,7 +188,7 @@ def sinh_test_case(problem, so_test=15):
     from .sandbox import LoiChayCode, chay_python
 
     van_ban = goi_llm(SINH_TEST_CASE % problem.description)
-    gen_code, sol_code, sol2_code, da_dap_an = _tach_gen_sol(van_ban)
+    gen_code, sol_code, sol2_code, da_dap_an, checker_code = _tach_gen_sol(van_ban)
 
     cac_test = []
     so_lan_hong = 0
@@ -257,6 +272,7 @@ def sinh_test_case(problem, so_test=15):
             'so_test': len(cac_test),
             'so_lan_hong': so_lan_hong,
             'da_dap_an': da_dap_an,
+            'checker': checker_code,
             'da_duyet': False,
         },
     )
@@ -296,11 +312,22 @@ def ghi_test_case(nhap):
         open(os.path.join(thu_muc_bai, '%02d.out' % k), 'w').write(dau_ra)
 
     with open(os.path.join(thu_muc_bai, 'init.yml'), 'w') as f:
+        # Co special judge thi khai bao, may cham se goi thay vi so sanh van ban.
+        if nhap.checker:
+            f.write('checker:\n')
+            f.write('  name: bridged\n')
+            f.write('  args:\n')
+            f.write('    files: checker.py\n')
+            f.write('    lang: PY3\n')
+            f.write('    type: default\n')
         f.write('test_cases:\n')
         for k in range(1, n + 1):
             diem = chia + (1 if k <= du else 0)
             f.write('- in: %02d.in\n  out: %02d.out\n  points: %d\n'
                     % (k, k, diem))
+
+    if nhap.checker:
+        open(os.path.join(thu_muc_bai, 'checker.py'), 'w').write(nhap.checker)
 
     open(os.path.join(thu_muc_bai, '_generator.py'), 'w').write(nhap.generator)
     open(os.path.join(thu_muc_bai, '_solver.py'), 'w').write(nhap.solver)
@@ -309,3 +336,27 @@ def ghi_test_case(nhap):
     nhap.save()
 
     return {'so_test': n, 'thu_muc': thu_muc_bai}
+
+
+def sinh_checker(nhap):
+    """Sinh special judge cho bai da dap an, dua tren ban nhap da co."""
+    from .llm_client import goi_llm
+    from .prompts import SINH_CHECKER
+
+    cac_test = json.loads(nhap.du_lieu or '[]')
+    if not cac_test:
+        raise LoiLuuBai('Chua co test nao de lam mau cho checker.')
+
+    vao_mau, ra_mau = cac_test[0]
+
+    van_ban = goi_llm(SINH_CHECKER % (
+        nhap.problem.description, vao_mau[:2000], ra_mau[:1000],
+    ))
+
+    code = van_ban.replace('```python', '').replace('```', '').strip()
+    if 'def check(' not in code:
+        raise LoiLuuBai('AI khong viet ra ham check():\n' + code[:400])
+
+    nhap.checker = code
+    nhap.save()
+    return code

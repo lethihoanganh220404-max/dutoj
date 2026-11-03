@@ -71,6 +71,29 @@ Output everything in this exact format, nothing else:
 <python code that reads that input from stdin and prints the correct answer to stdout>
 ===SOLVER2===
 <a SECOND solver, written independently, using a DIFFERENT approach from the first>
+===CHECKER===
+<Only if you answered YES above: a Python 3 special judge for the DMOJ judge.
+ If you answered NO, write exactly: KHONG CAN
+
+ The checker must have exactly this signature:
+
+     from dmoj.result import CheckerResult
+
+     def check(process_output, judge_output, judge_input=None, point_value=1, **kwargs):
+         ...
+
+ - process_output is the contestant's output, as bytes.
+ - judge_output is the reference output, as bytes.
+ - judge_input is the original test input, as bytes; it may be a lazy object,
+   so always call bytes(judge_input) before using it. Decode with .decode().
+ - Return CheckerResult(True, point_value) when the answer is valid.
+ - Return CheckerResult(False, 0, None, '<short reason>') when it is not.
+ - Do NOT compare process_output to judge_output token by token. VERIFY the
+   contestant's answer against the problem's rules, using judge_input.
+ - If the contestant claims no solution exists, check that judge_output says so too.
+ - Wrap parsing in try/except; on exception return
+   CheckerResult(False, 0, 'Checker error', str(e)).
+ - Standard library and dmoj.result only.>
 
 Rules:
 - Both solvers must be correct, even if slow. Correctness matters, speed does not.
@@ -94,4 +117,46 @@ IMPORTANT - the generator must read one argument from the command line:
 
   For 'lon', use the true maximum the statement allows, not a smaller safe number.
   The solver may be slow on these; that is acceptable and expected.
+"""
+
+
+SINH_CHECKER = """You are writing a special judge (checker) for a programming problem
+that accepts MANY different correct answers.
+
+PROBLEM STATEMENT:
+%s
+
+A reference answer looks like this (for the sample input below):
+
+INPUT:
+%s
+
+REFERENCE OUTPUT:
+%s
+
+Write a Python 3 checker for the DMOJ judge. Output ONLY the code, no fences,
+no explanation.
+
+The checker MUST have exactly this signature:
+
+    from dmoj.result import CheckerResult
+
+    def check(process_output, judge_output, judge_input=None, point_value=1, **kwargs):
+        ...
+
+Rules:
+- process_output is the contestant's output, as bytes.
+- judge_output is the reference output, as bytes.
+- judge_input is the original test input, as bytes. It may be a lazy object,
+  so always call bytes(judge_input) before using it.
+- Decode bytes with .decode() before parsing text.
+- Return CheckerResult(True, point_value) when the contestant's answer is valid.
+- Return CheckerResult(False, 0, None, '<short reason>') when it is not.
+- Do NOT compare the contestant's output to judge_output token by token.
+  VERIFY the contestant's answer against the problem's rules, using judge_input.
+- If the contestant claims no solution exists, check whether judge_output also
+  says so; disagreement means the contestant is wrong.
+- Wrap all parsing in try/except; on any exception return
+  CheckerResult(False, 0, 'Checker error', str(e)).
+- No imports other than the standard library and dmoj.result.
 """

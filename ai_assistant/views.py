@@ -158,6 +158,12 @@ def sinh_test(request, ma_bai):
             except LoiLuuBai as e:
                 ctx['loi'] = str(e)
 
+        elif hanh_dong == 'sinh_checker' and nhap:
+            from .tasks import task_sinh_checker
+            ket = task_sinh_checker.delay(nhap.id)
+            ctx['task_id'] = ket.id
+            ctx['dang_chay_checker'] = True
+
         elif hanh_dong == 'bo' and nhap:
             nhap.delete()
             ctx['nhap'] = None

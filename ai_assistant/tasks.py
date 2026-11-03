@@ -33,3 +33,13 @@ def task_sinh_test_case(self, problem_id, so_test=15):
         'thu_muc': kq['thu_muc'],
         'ok': True,
     }
+
+
+@shared_task(bind=True)
+def task_sinh_checker(self, nhap_id):
+    from .models import TestCaseNhap
+    from .services import sinh_checker
+
+    nhap = TestCaseNhap.objects.get(id=nhap_id)
+    sinh_checker(nhap)
+    return {'ok': True, 'nhap_id': nhap_id}

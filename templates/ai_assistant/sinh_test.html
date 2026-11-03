@@ -66,6 +66,28 @@
     </p>
   {% endif %}
 
+  {% if dang_chay_checker %}
+    <div class="ai-hop">
+      <p>Đang sinh special judge<span id="cham2">...</span></p>
+    </div>
+    <script>
+      (function () {
+        var n = 0, c = document.getElementById('cham2');
+        setInterval(function () { n = (n + 1) % 4; c.textContent = '.'.repeat(n); }, 500);
+        function hoi() {
+          fetch('/ai/task/{{ task_id }}/')
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (d.xong) { location.href = location.pathname; }
+              else { setTimeout(hoi, 3000); }
+            })
+            .catch(function () { setTimeout(hoi, 5000); });
+        }
+        setTimeout(hoi, 3000);
+      })();
+    </script>
+  {% endif %}
+
   {% if dang_chay %}
     <div class="ai-hop">
       <p>Đang sinh {{ so_test_yeu_cau }} test case<span id="cham">...</span></p>
@@ -136,6 +158,22 @@
         <summary>Xem code giải tham chiếu</summary>
         <pre>{{ nhap.solver }}</pre>
       </details>
+
+      {% if nhap.checker %}
+        <details open>
+          <summary>Special judge đã sinh (sẽ ghi kèm test case)</summary>
+          <pre>{{ nhap.checker }}</pre>
+        </details>
+      {% elif canh_bao_da_dap_an %}
+        <form method="post" style="margin: 14px 0;">
+          {% csrf_token %}
+          <input type="hidden" name="hanh_dong" value="sinh_checker">
+          <button type="submit" class="ai-nut">
+            Sinh special judge cho bài này
+          </button>
+          <span class="ai-nho">Tốn một lượt API. Giải quyết vấn đề đa đáp án.</span>
+        </form>
+      {% endif %}
 
       <form method="post" style="display:inline;">
         {% csrf_token %}

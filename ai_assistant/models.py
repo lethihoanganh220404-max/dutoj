@@ -47,6 +47,7 @@ class TestCaseNhap(models.Model):
 
     da_dap_an = models.TextField('AI bao bai co nhieu dap an dung khong',
                                 blank=True)
+    checker = models.TextField('code special judge', blank=True)
     ngay_tao = models.DateTimeField('ngay tao', auto_now_add=True)
 
     class Meta:
