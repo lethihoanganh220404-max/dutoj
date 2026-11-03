@@ -16,3 +16,20 @@ def task_sinh_goi_y(self, problem_id, lam_lai=False):
         'da_goi_api': da_goi_api,
         'ok': True,
     }
+
+
+@shared_task(bind=True)
+def task_sinh_test_case(self, problem_id, so_test=15):
+    from judge.models import Problem
+
+    from .services import sinh_test_case
+
+    bai = Problem.objects.get(id=problem_id)
+    kq = sinh_test_case(bai, so_test=so_test)
+    # Bo phan code dai, chi giu so lieu de hien len web.
+    return {
+        'so_test': kq['so_test'],
+        'so_lan_hong': kq['so_lan_hong'],
+        'thu_muc': kq['thu_muc'],
+        'ok': True,
+    }

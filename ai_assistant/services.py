@@ -1,5 +1,6 @@
 """Luu bai do AI sinh ra vao database, theo dung cach import_problems.py lam."""
 
+import json
 import re
 
 from django.db import transaction
@@ -146,8 +147,7 @@ def sinh_test_case(problem, so_test=15):
     import os
     import tempfile
 
-    from django.conf import settings
-
+    from .models import TestCaseNhap
     from .llm_client import goi_llm
     from .prompts import SINH_TEST_CASE
     from .sandbox import LoiChayCode, chay_python
@@ -188,10 +188,45 @@ def sinh_test_case(problem, so_test=15):
             % (len(cac_test), so_lan_hong)
         )
 
-    # Ghi ra thu muc problem_data theo dung chuan DMOJ.
+    # KHONG ghi thang vao /problems. Luu nhap de nguoi duyet truoc.
+    nhap, _ = TestCaseNhap.objects.update_or_create(
+        problem=problem,
+        defaults={
+            'generator': gen_code,
+            'solver': sol_code,
+            'du_lieu': json.dumps(cac_test),
+            'so_test': len(cac_test),
+            'so_lan_hong': so_lan_hong,
+            'da_duyet': False,
+        },
+    )
+
+    return {
+        'nhap_id': nhap.id,
+        'so_test': len(cac_test),
+        'so_lan_hong': so_lan_hong,
+        'test_mau': cac_test[:3],
+    }
+
+
+def ghi_test_case(nhap):
+    """Nguoi da duyet: ghi tu ban nhap ra thu muc /problems that."""
+    import os
+
+    from django.conf import settings
+
+    cac_test = json.loads(nhap.du_lieu)
+    if not cac_test:
+        raise LoiLuuBai('Ban nhap khong co test nao.')
+
     goc = getattr(settings, 'DMOJ_PROBLEM_DATA_ROOT', '/problems')
-    thu_muc_bai = os.path.join(str(goc), problem.code)
+    thu_muc_bai = os.path.join(str(goc), nhap.problem.code)
     os.makedirs(thu_muc_bai, exist_ok=True)
+
+    # Xoa test cu de khong lan lon voi test moi.
+    for ten in os.listdir(thu_muc_bai):
+        if ten.endswith('.in') or ten.endswith('.out'):
+            os.remove(os.path.join(thu_muc_bai, ten))
 
     n = len(cac_test)
     chia, du = divmod(100, n)
@@ -207,15 +242,10 @@ def sinh_test_case(problem, so_test=15):
             f.write('- in: %02d.in\n  out: %02d.out\n  points: %d\n'
                     % (k, k, diem))
 
-    # Luu lai code de sau nay sinh them test duoc.
-    open(os.path.join(thu_muc_bai, '_generator.py'), 'w').write(gen_code)
-    open(os.path.join(thu_muc_bai, '_solver.py'), 'w').write(sol_code)
+    open(os.path.join(thu_muc_bai, '_generator.py'), 'w').write(nhap.generator)
+    open(os.path.join(thu_muc_bai, '_solver.py'), 'w').write(nhap.solver)
 
-    return {
-        'so_test': n,
-        'so_lan_hong': so_lan_hong,
-        'thu_muc': thu_muc_bai,
-        'test_mau': cac_test[:3],
-        'generator': gen_code,
-        'solver': sol_code,
-    }
+    nhap.da_duyet = True
+    nhap.save()
+
+    return {'so_test': n, 'thu_muc': thu_muc_bai}

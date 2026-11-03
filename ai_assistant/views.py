@@ -106,3 +106,72 @@ def trang_thai_task(request, task_id):
         du_lieu['xong'] = False
 
     return JsonResponse(du_lieu)
+
+
+@staff_member_required
+def sinh_test(request, ma_bai):
+    """Sinh test case bang AI cho mot bai."""
+    import os
+
+    from django.conf import settings
+    from django.shortcuts import get_object_or_404
+
+    from judge.models import Problem
+
+    bai = get_object_or_404(Problem, code=ma_bai)
+
+    goc = getattr(settings, 'DMOJ_PROBLEM_DATA_ROOT', '/problems')
+    thu_muc = os.path.join(str(goc), bai.code)
+
+    ctx = {'bai': bai}
+
+    # Dem xem da co bao nhieu test
+    if os.path.isdir(thu_muc):
+        ctx['so_test_hien_co'] = len(
+            [t for t in os.listdir(thu_muc)
+             if t.endswith('.in') and not t.startswith('_')]
+        )
+        ctx['co_init'] = os.path.isfile(os.path.join(thu_muc, 'init.yml'))
+
+    from .models import TestCaseNhap
+    nhap = TestCaseNhap.objects.filter(problem=bai).first()
+    ctx['nhap'] = nhap
+
+    if nhap:
+        import json
+        cac_test = json.loads(nhap.du_lieu or '[]')
+        ctx['test_mau'] = [
+            {'stt': i + 1, 'vao': v[:500], 'ra': r[:300]}
+            for i, (v, r) in enumerate(cac_test[:3])
+        ]
+
+    if request.method == 'POST':
+        hanh_dong = request.POST.get('hanh_dong', 'sinh')
+
+        if hanh_dong == 'duyet' and nhap:
+            from .services import ghi_test_case
+            try:
+                kq = ghi_test_case(nhap)
+                ctx['da_ghi'] = kq
+            except LoiLuuBai as e:
+                ctx['loi'] = str(e)
+
+        elif hanh_dong == 'bo' and nhap:
+            nhap.delete()
+            ctx['nhap'] = None
+            ctx['test_mau'] = None
+            ctx['da_bo'] = True
+
+        else:
+            from .tasks import task_sinh_test_case
+            try:
+                so_test = int(request.POST.get('so_test') or 15)
+            except ValueError:
+                so_test = 15
+            so_test = max(5, min(so_test, 30))
+            ket = task_sinh_test_case.delay(bai.id, so_test)
+            ctx['task_id'] = ket.id
+            ctx['dang_chay'] = True
+            ctx['so_test_yeu_cau'] = so_test
+
+    return render(request, 'ai_assistant/sinh_test.html', ctx)

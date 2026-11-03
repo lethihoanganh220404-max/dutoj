@@ -26,3 +26,30 @@ class GoiY(models.Model):
 
     def __str__(self):
         return 'Goi y cho %s' % self.problem.code
+
+
+class TestCaseNhap(models.Model):
+    """Test case AI vua sinh, cho nguoi duyet truoc khi ghi ra /problems."""
+
+    problem = models.OneToOneField(
+        Problem,
+        on_delete=models.CASCADE,
+        related_name='ai_test_nhap',
+        verbose_name='bai tap',
+    )
+    generator = models.TextField('code sinh du lieu vao', blank=True)
+    solver = models.TextField('code giai tham chieu', blank=True)
+    du_lieu = models.TextField('cac cap input/output dang JSON', blank=True)
+
+    so_test = models.PositiveIntegerField('so test', default=0)
+    so_lan_hong = models.PositiveIntegerField('so lan chay hong', default=0)
+    da_duyet = models.BooleanField('da duyet va ghi ra /problems', default=False)
+
+    ngay_tao = models.DateTimeField('ngay tao', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'test case nhap'
+        verbose_name_plural = 'test case nhap'
+
+    def __str__(self):
+        return 'Test nhap cho %s (%d test)' % (self.problem.code, self.so_test)
