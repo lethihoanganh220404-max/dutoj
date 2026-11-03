@@ -1,92 +1,93 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <title>AI ho tro soan de</title>
-  <style>
-    body { font-family: sans-serif; max-width: 860px; margin: 40px auto; padding: 0 16px; }
-    label { display: inline-block; width: 150px; }
-    input[type=text] { width: 260px; padding: 4px; }
-    .hop { background: #f7f7f7; border: 1px solid #ddd;
-           padding: 16px; margin: 20px 0; }
-    .loi { background: #fee; border: 1px solid #fcc; padding: 12px;
-           white-space: pre-wrap; word-break: break-word; }
-    .ok  { background: #efe; border: 1px solid #cec; padding: 12px; }
-    .ghi-chu { color: #888; font-size: 13px; }
-    button { padding: 6px 14px; }
-  </style>
-</head>
-<body>
+{% extends "common-content.html" %}
 
-  <h1>AI hỗ trợ soạn đề</h1>
+{% block content_media %}
+<style>
+  .ai-hop { background: var(--background-soft, #f7f7f7);
+            border: 1px solid var(--border-grey, #ddd);
+            border-radius: 6px; padding: 18px; margin: 18px 0; }
+  .ai-hop h3 { margin-top: 0; }
+  .ai-loi { background: #fdeaea; border-left: 4px solid #d44;
+            padding: 12px 16px; white-space: pre-wrap;
+            word-break: break-word; border-radius: 4px; }
+  .ai-ok { background: #eaf7ea; border-left: 4px solid #2a7;
+           padding: 12px 16px; border-radius: 4px; }
+  .ai-nho { color: #888; font-size: 13px; }
+  .ai-dong { margin: 10px 0; }
+  .ai-dong label { display: inline-block; width: 160px; font-weight: 600; }
+  .ai-dong input[type=text] { width: 280px; padding: 6px;
+                              border: 1px solid #ccc; border-radius: 4px; }
+  .ai-md { width: 100%; font-family: monospace; font-size: 13px;
+           padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+  .ai-nut { padding: 9px 18px; border-radius: 4px; cursor: pointer;
+            border: 1px solid #999; background: #fff; font-size: 14px; }
+  .ai-nut-chinh { background: #2a7; color: #fff; border-color: #2a7; }
+</style>
+{% endblock %}
+
+{% block description %}
 
   {% if loi %}
-    <h2 style="color:#c00;">Lỗi</h2>
-    <pre class="loi">{{ loi }}</pre>
+    <div class="ai-loi">{{ loi }}</div>
   {% endif %}
 
   {% if da_luu %}
-    <p class="ok">
-      Đã lưu bài <strong>{{ da_luu }}</strong> vào database.
-      <a href="/problem/{{ da_luu }}">Xem bài</a> |
-      <a href="/admin/judge/problem/">Quản lý bài</a><br>
-      <span class="ghi-chu">Bài đang ẩn vì chưa có test case.
-      Thêm test case rồi mới bật công khai.</span>
-    </p>
+    <div class="ai-ok">
+      Đã lưu bài <strong>{{ da_luu }}</strong> vào hệ thống.
+      <a href="/problem/{{ da_luu }}">Xem bài</a> ·
+      <a href="/ai/sinh-test/{{ da_luu }}/">Sinh test case</a><br>
+      <span class="ai-nho">Bài đang ẩn vì chưa có test case.</span>
+    </div>
   {% endif %}
 
-  <div class="hop">
+  <div class="ai-hop">
     <h3>Bước 1 — Đọc ảnh đề</h3>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="hidden" name="hanh_dong" value="doc_anh">
       <p><input type="file" name="anh_de" accept="image/*"></p>
-      <p><button type="submit">Gửi ảnh cho AI</button></p>
+      <p><button type="submit" class="ai-nut">Gửi ảnh cho AI</button></p>
     </form>
-    <p class="ghi-chu">Mất 10–60 giây. Bấm một lần rồi chờ.</p>
+    <p class="ai-nho">Mất 10–60 giây. Bấm một lần rồi chờ.</p>
   </div>
 
   {% if ket_qua %}
-  <div class="hop">
+  <div class="ai-hop">
     <h3>Bước 2 — Duyệt rồi lưu</h3>
     <form method="post">
       {% csrf_token %}
       <input type="hidden" name="hanh_dong" value="luu_db">
 
-      <p>
+      <div class="ai-dong">
         <label>Mã bài</label>
         <input type="text" name="ma_bai" value="{{ ma_bai|default('') }}"
                placeholder="vd: dut_sum_even" required>
-      </p>
-      <p>
+      </div>
+      <div class="ai-dong">
         <label>Tên bài</label>
         <input type="text" name="ten_bai" value="{{ ten_bai|default('') }}" required>
-      </p>
-      <p>
+      </div>
+      <div class="ai-dong">
         <label>Thời gian (giây)</label>
         <input type="text" name="time_limit" value="{{ time_limit }}">
-      </p>
-      <p>
+      </div>
+      <div class="ai-dong">
         <label>Bộ nhớ (KB)</label>
         <input type="text" name="memory_limit" value="{{ memory_limit }}">
-      </p>
-      <p>
+      </div>
+      <div class="ai-dong">
         <label>Điểm</label>
         <input type="text" name="points" value="{{ points }}">
-      </p>
+      </div>
 
-      <p class="ghi-chu">
+      <p class="ai-nho">
         Đọc kỹ Markdown bên dưới trước khi lưu. Sửa trực tiếp được.
         Chỗ nào ghi UNCLEAR là AI không đọc được.
       </p>
-      <textarea name="ket_qua" rows="26"
-                style="width:100%; font-family:monospace; font-size:13px;"
-      >{{ ket_qua }}</textarea>
+      <textarea name="ket_qua" rows="24" class="ai-md">{{ ket_qua }}</textarea>
 
-      <p><button type="submit">Lưu vào database</button></p>
+      <p><button type="submit" class="ai-nut ai-nut-chinh">Lưu vào hệ thống</button></p>
     </form>
   </div>
   {% endif %}
 
-</body>
-</html>
+{% endblock %}

@@ -11,6 +11,7 @@ GIOI_HAN_MB = 8
 @staff_member_required
 def upload_image(request):
     ctx = {
+        'title': 'AI hỗ trợ soạn đề',
         'time_limit': '1.0',
         'memory_limit': '262144',
         'points': '1',
@@ -74,7 +75,7 @@ def xem_goi_y(request, ma_bai):
     from .services import sinh_goi_y
 
     bai = get_object_or_404(Problem, code=ma_bai)
-    ctx = {'bai': bai}
+    ctx = {'bai': bai, 'title': 'Gợi ý AI — %s' % bai.name}
 
     ctx['goi_y'] = GoiY.objects.filter(problem=bai).first()
 
@@ -123,7 +124,7 @@ def sinh_test(request, ma_bai):
     goc = getattr(settings, 'DMOJ_PROBLEM_DATA_ROOT', '/problems')
     thu_muc = os.path.join(str(goc), bai.code)
 
-    ctx = {'bai': bai}
+    ctx = {'bai': bai, 'title': 'Sinh test case — %s' % bai.name}
 
     # Dem xem da co bao nhieu test
     if os.path.isdir(thu_muc):
