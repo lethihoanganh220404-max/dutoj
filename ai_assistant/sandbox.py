@@ -35,6 +35,7 @@ def chay_python(duong_dan, dau_vao='', thu_muc=None, giay=None,
             text=True,
             timeout=giay or GIOI_HAN_GIAY,
             cwd=thu_muc,
+            env={'PATH': '/usr/local/bin:/usr/bin:/bin', 'HOME': '/tmp'},
             preexec_fn=_dat_gioi_han,
         )
     except subprocess.TimeoutExpired:
