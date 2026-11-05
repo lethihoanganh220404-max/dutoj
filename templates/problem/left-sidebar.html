@@ -22,6 +22,7 @@
     {{ make_tab_item('add', 'fa fa-plus', url('problem_add'), _('Add')) }}
   {% endif %}
   {% if request.user.is_superuser %}
+    {{ make_tab_item('ai_bang', 'fa fa-robot', url('ai_assistant:bang'), 'AI') }}
     {{ make_tab_item('admin', 'fa fa-edit', url('admin:judge_problem_changelist'), _('Admin'), force_new_page=True) }}
   {% endif %}
 </div>

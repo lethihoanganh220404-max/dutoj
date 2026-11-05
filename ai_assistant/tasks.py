@@ -30,7 +30,7 @@ def task_sinh_test_case(self, problem_id, so_test=15):
     return {
         'so_test': kq['so_test'],
         'so_lan_hong': kq['so_lan_hong'],
-        'thu_muc': kq['thu_muc'],
+        'nhap_id': kq.get('nhap_id'),
         'ok': True,
     }
 
