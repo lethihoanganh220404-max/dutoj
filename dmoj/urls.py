@@ -69,6 +69,7 @@ from judge.views import package_import
 from judge.views import quiz_import
 from judge.views import document_library
 from judge.views import review as problem_review
+from judge.views import chu_de
 from judge.views import contest_review
 from judge.views.problem_attachment import (
     attachment_delete,
@@ -294,6 +295,7 @@ urlpatterns = [
         r"^problems/review/",
         paged_list_view(problem_review.ProblemReviewListView, "problem_review_list"),
     ),
+    re_path(r"^problems/chu-de/$", chu_de.danh_sach_chu_de, name="danh_sach_chu_de"),
     re_path(r"^problems/", paged_list_view(problem.ProblemList, "problem_list")),
     re_path(r"^problems/add/$", problem.ProblemAdd.as_view(), name="problem_add"),
     re_path(

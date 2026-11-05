@@ -1,0 +1,46 @@
+{% extends "common-content.html" %}
+
+{% block content_title %}{{ _('Chủ đề') }}{% endblock %}
+
+{% block body %}
+<style>
+  .luoi-chu-de {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .the-chu-de {
+    display: block;
+    padding: 16px 18px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: border-color .15s, transform .15s;
+  }
+  .the-chu-de:hover {
+    border-color: #c0392b;
+    transform: translateY(-2px);
+  }
+  .ten-chu-de {
+    font-size: 1.05em;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .so-bai-chu-de {
+    font-size: .9em;
+    opacity: .7;
+  }
+</style>
+
+<p>{{ _('Chọn một chủ đề để xem các bài tập thuộc chủ đề đó.') }}</p>
+
+<div class="luoi-chu-de">
+  {% for ct in danh_sach %}
+    <a class="the-chu-de" href="{{ url('problem_list') }}?type={{ ct.id }}">
+      <div class="ten-chu-de">{{ ct.full_name or ct.name }}</div>
+      <div class="so-bai-chu-de">{{ ct.so_bai }} {{ _('bài') }}</div>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}
