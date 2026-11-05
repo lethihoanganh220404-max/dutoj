@@ -183,3 +183,75 @@ def sinh_test(request, ma_bai):
             ctx['so_test_yeu_cau'] = so_test
 
     return render(request, 'ai_assistant/sinh_test.html', ctx)
+
+
+@staff_member_required
+def bang_dieu_khien(request):
+    """Xem tong quan: bai nao co goi y, bai nao co test case."""
+    import os
+
+    from django.conf import settings
+    from django.core.paginator import Paginator
+
+    from judge.models import Problem
+
+    from .models import GoiY, TestCaseNhap
+
+    goc = str(getattr(settings, 'DMOJ_PROBLEM_DATA_ROOT', '/problems'))
+
+    # Quet mot lan, dem so test cua tung bai.
+    so_test = {}
+    if os.path.isdir(goc):
+        for ten in os.listdir(goc):
+            d = os.path.join(goc, ten)
+            if os.path.isdir(d):
+                n = len([t for t in os.listdir(d) if t.endswith('.in')])
+                if n:
+                    so_test[ten] = n
+
+    ma_co_goi_y = set(
+        GoiY.objects.values_list('problem__code', flat=True)
+    )
+    ma_co_nhap = set(
+        TestCaseNhap.objects.filter(da_duyet=False)
+                            .values_list('problem__code', flat=True)
+    )
+
+    loc = request.GET.get('loc', '')
+    tim = request.GET.get('tim', '').strip()
+
+    ds = Problem.objects.order_by('code')
+    if tim:
+        ds = ds.filter(code__icontains=tim) | ds.filter(name__icontains=tim)
+
+    cac_bai = []
+    for p in ds.only('code', 'name', 'is_public'):
+        n = so_test.get(p.code, 0)
+        bai = {
+            'code': p.code,
+            'name': p.name,
+            'is_public': p.is_public,
+            'so_test': n,
+            'co_goi_y': p.code in ma_co_goi_y,
+            'cho_duyet': p.code in ma_co_nhap,
+        }
+        if loc == 'thieu_test' and n:
+            continue
+        if loc == 'thieu_goi_y' and bai['co_goi_y']:
+            continue
+        if loc == 'cho_duyet' and not bai['cho_duyet']:
+            continue
+        cac_bai.append(bai)
+
+    trang = Paginator(cac_bai, 50).get_page(request.GET.get('trang'))
+
+    return render(request, 'ai_assistant/bang.html', {
+        'title': 'Bảng điều khiển AI',
+        'trang': trang,
+        'loc': loc,
+        'tim': tim,
+        'tong_bai': ds.count(),
+        'tong_co_test': len(so_test),
+        'tong_co_goi_y': len(ma_co_goi_y),
+        'tong_cho_duyet': len(ma_co_nhap),
+    })

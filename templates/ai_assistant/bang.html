@@ -1,0 +1,114 @@
+{% extends "common-content.html" %}
+
+{% block content_media %}
+<style>
+  .ai-thongke { display: flex; gap: 14px; margin: 18px 0; flex-wrap: wrap; }
+  .ai-o { background: var(--background-soft, #f7f7f7);
+          border: 1px solid var(--border-grey, #ddd); border-radius: 6px;
+          padding: 14px 20px; min-width: 130px; }
+  .ai-o .so { font-size: 26px; font-weight: 700; }
+  .ai-o .nhan { font-size: 12px; color: #777; text-transform: uppercase; }
+  .ai-loc { margin: 16px 0; }
+  .ai-loc a { display: inline-block; padding: 6px 14px; margin-right: 6px;
+              border: 1px solid #ccc; border-radius: 4px;
+              text-decoration: none; font-size: 14px; }
+  .ai-loc a.chon { background: #2a7; color: #fff; border-color: #2a7; }
+  table.ai-bang { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.ai-bang th { text-align: left; padding: 9px 10px;
+                     border-bottom: 2px solid var(--border-grey, #ccc); }
+  table.ai-bang td { padding: 8px 10px;
+                     border-bottom: 1px solid var(--border-grey, #eee); }
+  .nhan-xanh { color: #2a7; font-weight: 600; }
+  .nhan-xam { color: #bbb; }
+  .nhan-cam { color: #d80; font-weight: 600; }
+  .ai-tim input { padding: 7px; width: 240px;
+                  border: 1px solid #ccc; border-radius: 4px; }
+  .ai-tim button { padding: 7px 14px; border: 1px solid #999;
+                   border-radius: 4px; background: #fff; cursor: pointer; }
+  .ai-trang { margin: 20px 0; }
+  .ai-trang a { padding: 5px 10px; border: 1px solid #ccc;
+                border-radius: 4px; text-decoration: none; margin-right: 4px; }
+</style>
+{% endblock %}
+
+{% block description %}
+
+  <div class="ai-thongke">
+    <div class="ai-o"><div class="so">{{ tong_bai }}</div>
+      <div class="nhan">tổng số bài</div></div>
+    <div class="ai-o"><div class="so">{{ tong_co_test }}</div>
+      <div class="nhan">có test case</div></div>
+    <div class="ai-o"><div class="so">{{ tong_co_goi_y }}</div>
+      <div class="nhan">có gợi ý AI</div></div>
+    <div class="ai-o"><div class="so">{{ tong_cho_duyet }}</div>
+      <div class="nhan">chờ duyệt</div></div>
+  </div>
+
+  <form method="get" class="ai-tim">
+    <input type="text" name="tim" value="{{ tim }}" placeholder="Tìm mã hoặc tên bài">
+    <input type="hidden" name="loc" value="{{ loc }}">
+    <button type="submit">Tìm</button>
+    <a href="/ai/upload/" style="margin-left:14px;">+ Thêm bài từ ảnh</a>
+  </form>
+
+  <div class="ai-loc">
+    <a href="?tim={{ tim }}" class="{% if not loc %}chon{% endif %}">Tất cả</a>
+    <a href="?loc=thieu_test&tim={{ tim }}"
+       class="{% if loc == 'thieu_test' %}chon{% endif %}">Thiếu test case</a>
+    <a href="?loc=thieu_goi_y&tim={{ tim }}"
+       class="{% if loc == 'thieu_goi_y' %}chon{% endif %}">Thiếu gợi ý</a>
+    <a href="?loc=cho_duyet&tim={{ tim }}"
+       class="{% if loc == 'cho_duyet' %}chon{% endif %}">Chờ duyệt</a>
+  </div>
+
+  <table class="ai-bang">
+    <tr>
+      <th>Mã bài</th><th>Tên</th><th>Test case</th>
+      <th>Gợi ý AI</th><th>Trạng thái</th><th></th>
+    </tr>
+    {% for b in trang %}
+    <tr>
+      <td><a href="/problem/{{ b.code }}">{{ b.code }}</a></td>
+      <td>{{ b.name }}</td>
+      <td>
+        {% if b.so_test %}
+          <span class="nhan-xanh">{{ b.so_test }}</span>
+        {% else %}
+          <span class="nhan-xam">chưa có</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if b.co_goi_y %}
+          <span class="nhan-xanh">có</span>
+        {% else %}
+          <span class="nhan-xam">chưa</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if b.cho_duyet %}
+          <span class="nhan-cam">chờ duyệt</span>
+        {% elif b.is_public %}
+          công khai
+        {% else %}
+          <span class="nhan-xam">ẩn</span>
+        {% endif %}
+      </td>
+      <td>
+        <a href="/ai/sinh-test/{{ b.code }}/">test</a> ·
+        <a href="/ai/goi-y/{{ b.code }}/">gợi ý</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div class="ai-trang">
+    {% if trang.has_previous() %}
+      <a href="?trang={{ trang.previous_page_number() }}&loc={{ loc }}&tim={{ tim }}">‹ Trước</a>
+    {% endif %}
+    <span>Trang {{ trang.number }} / {{ trang.paginator.num_pages }}</span>
+    {% if trang.has_next() %}
+      <a href="?trang={{ trang.next_page_number() }}&loc={{ loc }}&tim={{ tim }}">Sau ›</a>
+    {% endif %}
+  </div>
+
+{% endblock %}
