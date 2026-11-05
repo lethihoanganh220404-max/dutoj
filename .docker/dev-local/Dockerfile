@@ -28,6 +28,8 @@ WORKDIR /code
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
 RUN pip3 install --no-cache-dir -r requirements.txt mysqlclient
+# Thu vien docker: de chay code AI sinh ra trong container cach ly
+RUN pip3 install --no-cache-dir docker==7.1.0
 
 # Path is relative to build context (online-judge/)
 COPY .docker/dev-local/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
