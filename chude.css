@@ -1,0 +1,173 @@
+/* ==========================================================================
+   BKOJ - Trang lộ trình luyện tập (/chu-de/), giao diện theo mẫu "Giáo trình".
+   Mỗi khối ứng với một component trong templates/chude/components/
+   Đổi màu chủ đạo: sửa --bk-primary (mẫu dùng tím #4f46e5; xanh trường là #075794).
+   ========================================================================== */
+
+/* ---- Biến dùng chung ---- */
+.bk-page {
+  --bk-primary: #4f46e5;
+  --bk-primary-hover: #4338ca;
+  --bk-badge-bg: #e0f2fe;
+  --bk-badge-text: #0369a1;
+  --bk-pct: #ea580c;
+  --bk-surface: #ffffff;
+  --bk-chip-bg: #f1f5f9;
+  --bk-border: #e5e7eb;
+  --bk-title: #111827;
+  --bk-text: #1f2937;
+  --bk-muted: #6b7280;
+  --bk-radius: 12px;
+  --bk-shadow: 0 1px 2px rgba(15, 23, 42, .06);
+  --bk-shadow-hover: 0 8px 20px rgba(15, 23, 42, .08);
+
+  font-family: "Be Vietnam Pro", "Segoe UI", Roboto, Arial, sans-serif;
+  max-width: 1430px;
+  margin: 0 auto;
+  padding: 28px 28px 56px;
+  color: var(--bk-text);
+}
+
+/* ---- page_header ---- */
+.bk-page-header { margin: 0 0 34px; }
+.bk-page-title {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 2.15rem; font-weight: 800; color: var(--bk-title); letter-spacing: -.01em; margin: 0 0 12px;
+}
+.bk-page-icon { font-size: .85em; }
+.bk-page-sub { color: var(--bk-muted); margin: 0; font-size: 1.05rem; line-height: 1.6; }
+.bk-page-sub a { color: var(--bk-primary); font-weight: 600; }
+
+/* ---- filter_bar ---- */
+.bk-filter-bar {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between;
+  background: var(--bk-surface); border: 1px solid #eef0f3; border-radius: var(--bk-radius);
+  padding: 18px 22px; box-shadow: var(--bk-shadow); margin-bottom: 30px;
+}
+.bk-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+.bk-tab {
+  font-family: inherit; border: 0; background: var(--bk-chip-bg); color: #334155;
+  font-weight: 600; font-size: 1rem; padding: 9px 18px; border-radius: 8px; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.bk-tab:hover { background: #e2e8f0; }
+.bk-tab.is-active { background: var(--bk-primary); color: #fff; }
+.bk-tab.is-active:hover { background: var(--bk-primary-hover); }
+.bk-search {
+  flex: 0 1 325px; min-width: 220px; display: flex; align-items: center; gap: 8px;
+  border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 14px; background: var(--bk-surface);
+}
+.bk-search:focus-within { border-color: var(--bk-primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, .15); }
+.bk-search-icon { font-size: .95rem; }
+.bk-search input {
+  flex: 1; border: 0; outline: none; padding: 10px 0; font-family: inherit; font-size: .98rem;
+  color: var(--bk-text); background: transparent;
+}
+.bk-search input::placeholder { color: #64748b; }
+
+/* ---- badge ---- */
+.bk-badge { display: inline-block; font-weight: 600; font-size: .88rem; padding: 3px 9px; border-radius: 5px; }
+.bk-badge--primary { background: var(--bk-badge-bg); color: var(--bk-badge-text); }
+.bk-badge--muted { background: var(--bk-chip-bg); color: var(--bk-muted); font-weight: 500; }
+
+/* ---- section_header + card_section ---- */
+.bk-section { margin-bottom: 38px; }
+.bk-section-header { margin-bottom: 20px; }
+.bk-section-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 1.45rem; font-weight: 700; color: var(--bk-title); margin: 0;
+}
+.bk-section-title .bk-badge { font-size: .9rem; margin-left: 4px; }
+.bk-section-icon { font-size: 1.15em; }
+.bk-section-intro { color: var(--bk-muted); margin: 6px 0 0; }
+.bk-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+
+/* ---- topic_card ---- */
+.bk-card {
+  display: flex; flex-direction: column; background: var(--bk-surface);
+  border: 1px solid var(--bk-border); border-radius: var(--bk-radius);
+  padding: 22px 22px 18px; box-shadow: var(--bk-shadow);
+  text-decoration: none !important; color: inherit !important;
+  transition: box-shadow .15s, border-color .15s, transform .15s;
+}
+.bk-card:hover { box-shadow: var(--bk-shadow-hover); border-color: #d1d5db; transform: translateY(-2px); }
+.bk-card-top { display: flex; justify-content: space-between; align-items: center; min-height: 26px; }
+.bk-card-pct { color: var(--bk-pct); font-weight: 600; font-size: .92rem; }
+.bk-card-title { font-size: 1.28rem; font-weight: 700; color: var(--bk-title); margin: 14px 0 10px; }
+.bk-card-desc {
+  flex: 1; color: var(--bk-muted); font-size: .98rem; line-height: 1.55; margin: 0 0 16px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  min-height: 3.1em;
+}
+.bk-card-foot {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  border-top: 1px solid #eef0f3; padding-top: 14px; font-size: .98rem;
+}
+.bk-card-meta { display: inline-flex; align-items: center; gap: 6px; color: var(--bk-muted); }
+.bk-card-meta-icon { font-size: .9em; }
+.bk-card-action { color: var(--bk-primary); font-weight: 600; white-space: nowrap; }
+.bk-card:hover .bk-card-action { color: var(--bk-primary-hover); }
+
+/* ---- progress_bar (không dùng trong mẫu, giữ lại cho trang khác) ---- */
+.bk-progress { height: 5px; background: #eef1f4; border-radius: 99px; overflow: hidden; margin-bottom: 12px; }
+.bk-progress-fill { height: 100%; border-radius: 99px; background: var(--bk-primary); }
+
+/* ---- empty_state ---- */
+.bk-empty { text-align: center; color: var(--bk-muted); padding: 40px 0; }
+
+/* ---- Màn hình vừa và điện thoại ---- */
+@media (max-width: 1100px) { .bk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .bk-page { padding: 16px 14px 40px; }
+  .bk-page-title { font-size: 1.55rem; }
+  .bk-grid { grid-template-columns: 1fr; }
+  .bk-search { flex: 1 1 100%; }
+}
+
+/* ---- Chống giao diện chung của LQDOJ ghi đè ---- */
+.bk-page .bk-page-header {
+  position: static; height: auto; min-height: 0; background: none; box-shadow: none;
+  padding: 0; border: 0; color: var(--bk-text);
+}
+.bk-page .bk-page-title { color: var(--bk-title); background: none; border: 0; padding: 0; }
+.bk-page .bk-page-sub { color: var(--bk-muted); }
+.bk-page .bk-search input,
+.bk-page .bk-search input[type="search"] {
+  text-align: left; border: 0; box-shadow: none; height: auto; margin: 0; width: auto;
+}
+.bk-page .bk-section-title { border: 0; padding: 0; background: none; }
+
+/* ==========================================================================
+   Chế độ tối. Áp dụng khi LQDOJ bật dark mode (lớp .dark-mode / data-theme="dark"),
+   hoặc khi chude.js phát hiện nền trang tối (lớp .bk-dark).
+   ========================================================================== */
+.bk-page.bk-dark,
+.dark-mode .bk-page,
+[data-theme="dark"] .bk-page {
+  --bk-primary: #6366f1;
+  --bk-primary-hover: #818cf8;
+  --bk-badge-bg: rgba(56, 189, 248, .14);
+  --bk-badge-text: #7dd3fc;
+  --bk-pct: #fb923c;
+  --bk-surface: #26272c;
+  --bk-chip-bg: #34353b;
+  --bk-border: #3a3b42;
+  --bk-title: #f3f4f6;
+  --bk-text: #e5e7eb;
+  --bk-muted: #a1a1aa;
+  --bk-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  --bk-shadow-hover: 0 10px 24px rgba(0, 0, 0, .45);
+}
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-filter-bar { border-color: var(--bk-border); }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-tab { color: #d4d4d8; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-tab:hover { background: #3f4047; color: #fff; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-tab.is-active { background: var(--bk-primary); color: #fff; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-search { background: #1d1e22; border-color: #4b4c55; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-search input { color: var(--bk-text); background: transparent; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-search input::placeholder { color: #8b8b93; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-card:hover { border-color: #52535c; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-card-foot { border-top-color: var(--bk-border); }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-card-action,
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-page-sub a { color: #a5b4fc; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-card:hover .bk-card-action { color: #c7d2fe; }
+:is(.bk-page.bk-dark, .dark-mode .bk-page, [data-theme="dark"] .bk-page) .bk-progress { background: #3a3b42; }

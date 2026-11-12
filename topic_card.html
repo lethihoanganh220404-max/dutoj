@@ -1,0 +1,17 @@
+{#- Component: thẻ chủ đề. card: {num, name, desc, count, done, pct, url};
+    t: nhãn theo ngôn ngữ (topic, problems, go); show_progress: có hiện % tiến độ không. -#}
+{% from "chude/components/badge.html" import badge %}
+{% macro topic_card(card, t, show_progress=False) -%}
+<a class="bk-card" href="{{ card.url }}" data-bk-item data-text="{{ card.name }} {{ card.desc }}">
+  <div class="bk-card-top">
+    {{ badge(t.topic ~ " " ~ card.num) }}
+    {% if show_progress and card.done %}<span class="bk-card-pct">{{ card.pct }}%</span>{% endif %}
+  </div>
+  <h3 class="bk-card-title">{{ card.name }}</h3>
+  <p class="bk-card-desc">{{ card.desc }}</p>
+  <div class="bk-card-foot">
+    <span class="bk-card-meta"><span class="bk-card-meta-icon">📝</span>{{ card.count }} {{ t.problems }}</span>
+    <span class="bk-card-action">{{ t.go }}</span>
+  </div>
+</a>
+{%- endmacro %}

@@ -1,0 +1,6 @@
+{#- Component: thanh tiến độ, pct từ 0 đến 100. -#}
+{% macro progress_bar(pct) -%}
+<div class="bk-progress" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100">
+  <div class="bk-progress-fill" style="width: {{ pct }}%"></div>
+</div>
+{%- endmacro %}

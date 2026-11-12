@@ -1,0 +1,11 @@
+{#- Component: một phần gồm tiêu đề và lưới thẻ chủ đề. -#}
+{% from "chude/components/section_header.html" import section_header %}
+{% from "chude/components/topic_card.html" import topic_card %}
+{% macro card_section(stage, t, show_progress=False) -%}
+<section class="bk-section" data-bk-group="{{ stage.key }}">
+  {{ section_header(stage.icon, stage.title, stage.cards|length ~ " " ~ t.topics_count) }}
+  <div class="bk-grid">
+    {% for card in stage.cards %}{{ topic_card(card, t, show_progress) }}{% endfor %}
+  </div>
+</section>
+{%- endmacro %}

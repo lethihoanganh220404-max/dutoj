@@ -1,0 +1,4 @@
+{#- Component: nhãn nhỏ. tone: "primary" (xanh) hoặc "muted" (xám). -#}
+{% macro badge(text, tone="primary") -%}
+<span class="bk-badge bk-badge--{{ tone }}">{{ text }}</span>
+{%- endmacro %}

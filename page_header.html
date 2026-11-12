@@ -1,0 +1,10 @@
+{#- Component: tiêu đề trang. login_link/login_rest: lời nhắc đăng nhập (để trống thì không hiện). -#}
+{% macro page_header(icon, title, subtitle, login_link="", login_rest="") -%}
+<div class="bk-page-header">
+  <h1 class="bk-page-title"><span class="bk-page-icon">{{ icon }}</span>{{ title }}</h1>
+  <p class="bk-page-sub">
+    {{ subtitle }}
+    {% if login_link %}<a href="/accounts/login/">{{ login_link }}</a> {{ login_rest }}{% endif %}
+  </p>
+</div>
+{%- endmacro %}

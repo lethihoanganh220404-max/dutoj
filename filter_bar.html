@@ -1,0 +1,17 @@
+{#- Component: thanh lọc gồm các tab và ô tìm kiếm.
+    tabs: danh sách {key, label, count}; tab đầu tiên được chọn sẵn. -#}
+{% macro filter_bar(tabs, placeholder="Tìm kiếm…") -%}
+<div class="bk-filter-bar" data-bk-filter>
+  <div class="bk-tabs" role="tablist">
+    {% for t in tabs %}
+    <button type="button" class="bk-tab{% if loop.first %} is-active{% endif %}" data-filter="{{ t.key }}" role="tab">
+      {{ t.label }} ({{ t.count }})
+    </button>
+    {% endfor %}
+  </div>
+  <label class="bk-search">
+    <span class="bk-search-icon" aria-hidden="true">🔍</span>
+    <input type="search" data-bk-search placeholder="{{ placeholder }}">
+  </label>
+</div>
+{%- endmacro %}

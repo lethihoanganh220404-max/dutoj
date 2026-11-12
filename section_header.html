@@ -1,0 +1,8 @@
+{#- Component: tiêu đề một phần (giai đoạn) kèm số lượng. -#}
+{% from "chude/components/badge.html" import badge %}
+{% macro section_header(icon, title, count_text, intro="") -%}
+<div class="bk-section-header">
+  <h2 class="bk-section-title"><span class="bk-section-icon">{{ icon }}</span>{{ title }} {{ badge(count_text, "muted") }}</h2>
+  {% if intro %}<p class="bk-section-intro">{{ intro }}</p>{% endif %}
+</div>
+{%- endmacro %}
