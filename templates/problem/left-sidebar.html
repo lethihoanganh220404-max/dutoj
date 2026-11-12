@@ -5,12 +5,17 @@
   {% set problem_feed_url = problem_feed_url + '?' + query_string %}
   {% set problem_list_url = problem_list_url + '?' + query_string %}
 {% endif %}
+<style>
+  .muc-con { margin-left: 18px; border-left: 2px solid rgba(128,128,128,.25); }
+  .muc-con .left-sidebar-item { font-size: .95em; }
+</style>
 <div class="left-sidebar problem-left-sidebar">
-  {{ make_tab_item('feed', 'far fa-lightbulb', problem_feed_url, _('Feed')) }}
+  {{ make_tab_item('feed', 'far fa-lightbulb', problem_feed_url, _('Bảng tin')) }}
   {{ make_tab_item('list', 'fa fa-list', problem_list_url, _('List')) }}
-  {{ make_tab_item('chu_de', 'fa fa-th-large', url('danh_sach_chu_de'), _('Chủ đề')) }}
-  {{ make_tab_item('basics', 'fa fa-graduation-cap', url('basics_index'), _('C++ Basics')) }}
-  {{ make_tab_item('practice', 'fa fa-external-link-alt', url('practice_index'), _('100 English C++ problems')) }}
+  <div class="muc-con">
+    {{ make_tab_item('chu_de', 'fa fa-th-large', url('danh_sach_chu_de'), _('Topics')) }}
+    {{ make_tab_item('lotrinh', 'fa fa-graduation-cap', url('lotrinh_index'), _('C++ Roadmap')) }}
+  </div>
   {% if USE_ML_ENABLED() and request.user.is_authenticated %}
     {{ make_tab_item('semantic_search', 'fa fa-search', url('semantic_search'), _('Semantic Search')) }}
   {% endif %}

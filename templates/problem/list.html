@@ -34,11 +34,9 @@
             <th class="category">
               <a href="{{ sort_links.group }}">{{ _('Category') }}{{ sort_order.group }}</a>
             </th>
-            {% if show_types %}
-              <th>
-                {{ _('Types') }}
-              </th>
-            {% endif %}
+            <th>
+              {{ _('Types') }}
+            </th>
             <th class="points">
               <a href="{{ sort_links.points }}">{{ _('Points') }}{{ sort_order.points }}</a>
             </th>
@@ -98,13 +96,11 @@
                 <a class="pcodecell" href="{{ url('problem_detail', problem.code) }}">{{ problem.code }}</a>
               </td>
               <td class="category" data-label="{{ _('Category') }}">{{ problem.get_group_name() }}</td>
-              {% if show_types %}
-                <td class="types" data-label="{{ _('Types') }}">
-                  {% for type in problem.get_types_name() %}
-                    <span class="type-tag">{{ type }}</span>{% if not loop.last %}, {% endif %}
-                  {% endfor %}
-                </td>
-              {% endif %}
+              <td class="types" data-label="{{ _('Types') }}">
+                {% for type in problem.get_types_name() %}
+                  <span class="type-tag">{{ type }}</span>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+              </td>
               <td class="p" data-label="{{ _('Points') }}">{{ problem.points|floatformat }}{% if problem.get_partial() %}p{% endif %}</td>
               <td class="ac-rate" data-label="{{ _('AC %%') }}">{{ problem.get_ac_rate()|floatformat(0) }}%</td>
               <td class="users" data-label="{{ _('Solved by') }}">

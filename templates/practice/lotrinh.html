@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block body %}
+<style>
+  .luoi-the { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+              gap: 16px; margin-top: 16px; }
+  .the-lt { display: block; padding: 22px 24px; border: 1px solid #ccc;
+            border-radius: 10px; text-decoration: none;
+            transition: border-color .15s, transform .15s; }
+  .the-lt:hover { border-color: #c0392b; transform: translateY(-2px); }
+  .the-ten { font-size: 1.15em; font-weight: 600; margin-bottom: 6px; }
+  .the-mo-ta { font-size: .92em; opacity: .75; line-height: 1.45; }
+  .the-so { font-size: .88em; opacity: .6; margin-top: 10px; }
+</style>
+
+<p>{{ _('Two tracks, in order. Start with the basics, then practice by topic.') }}</p>
+
+<div class="luoi-the">
+  <a class="the-lt" href="{{ url('basics_index') }}">
+    <div class="the-ten">{{ _('C++ Basics') }}</div>
+    <div class="the-mo-ta">{{ _('Short problems, one concept each — input/output, conditions, loops.') }}</div>
+    <div class="the-so">19 {{ _('problems') }}</div>
+  </a>
+
+  <a class="the-lt" href="{{ url('practice_index') }}">
+    <div class="the-ten">{{ _('Practice by Topic') }}</div>
+    <div class="the-mo-ta">{{ _('Nine topics, each ordered from easier to harder.') }}</div>
+    <div class="the-so">90 {{ _('problems') }}</div>
+  </a>
+</div>
+{% endblock %}

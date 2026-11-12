@@ -725,9 +725,8 @@ class ProblemList(QueryStringSortMixin, TitleMixin, SolvedProblemMixin, ListView
             context["organizations"] = self.request.profile.get_organizations()
         context["category"] = self.category
         context["categories"] = get_all_problem_groups()
-        if self.show_types:
-            context["selected_types"] = self.selected_types
-            context["problem_types"] = get_all_problem_types()
+        context["selected_types"] = self.selected_types
+        context["problem_types"] = get_all_problem_types()
         context["has_fts"] = settings.ENABLE_FTS
         context["org_query"] = self.org_query
         context["author_query"] = Profile.objects.filter(id__in=self.author_query)
