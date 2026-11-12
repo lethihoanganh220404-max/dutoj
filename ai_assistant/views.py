@@ -1,4 +1,5 @@
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from .llm_client import LoiGoiLLM, goi_llm
@@ -254,4 +255,35 @@ def bang_dieu_khien(request):
         'tong_co_test': len(so_test),
         'tong_co_goi_y': len(ma_co_goi_y),
         'tong_cho_duyet': len(ma_co_nhap),
+    })
+
+
+@login_required
+def goi_y_sinh_vien(request, ma_bai):
+    """Goi y muc 1 va muc 2 cho sinh vien. Khong cho xem trong ky thi."""
+    from django.shortcuts import get_object_or_404, render
+
+    from judge.models import Problem
+
+    from .models import GoiY
+
+    bai = get_object_or_404(Problem, code=ma_bai)
+
+    # Dang lam bai trong ky thi thi khong duoc xem goi y.
+    if getattr(request, 'participation', None) is not None:
+        return render(request, 'ai_assistant/goi_y_sv.html', {
+            'bai': bai,
+            'title': 'Gợi ý — %s' % bai.name,
+            'trong_ky_thi': True,
+        })
+
+    gy = GoiY.objects.filter(problem=bai).first()
+
+    return render(request, 'ai_assistant/goi_y_sv.html', {
+        'bai': bai,
+        'title': 'Gợi ý — %s' % bai.name,
+        'muc1': gy.muc1 if gy else '',
+        'muc2': gy.muc2 if gy else '',
+        'co_goi_y': bool(gy and (gy.muc1 or gy.muc2)),
+        'trong_ky_thi': False,
     })

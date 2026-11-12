@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.bang_dieu_khien, name='bang'),
     path('upload/', views.upload_image, name='upload'),
     path('goi-y/<str:ma_bai>/', views.xem_goi_y, name='goi_y'),
+    path('goi-y-sv/<str:ma_bai>/', views.goi_y_sinh_vien, name='goi_y_sv'),
     path('sinh-test/<str:ma_bai>/', views.sinh_test, name='sinh_test'),
     path('task/<str:task_id>/', views.trang_thai_task, name='trang_thai_task'),
 ]

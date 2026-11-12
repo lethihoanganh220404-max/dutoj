@@ -281,6 +281,14 @@
     </div>
   {% endif %}
 
+  {% if request.user.is_authenticated and not request.participation and problem.ai_goi_y %}
+    <div class="link-row">
+      <a href="{{ url('ai_assistant:goi_y_sv', problem.code) }}">
+        <i class="fas fa-lightbulb"></i><span> Gợi ý</span>
+      </a>
+    </div>
+  {% endif %}
+
   {% if request.user.is_superuser %}
     <div class="link-row">
       <a href="{{ url('ai_assistant:goi_y', problem.code) }}">

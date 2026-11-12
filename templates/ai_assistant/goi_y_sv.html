@@ -1,0 +1,43 @@
+{% extends "common-content.html" %}
+
+{% block content_title %}{{ _('Gợi ý') }} — {{ bai.name }}{% endblock %}
+
+{% block body %}
+<style>
+  .hop-goi-y { border: 1px solid #ddd; border-radius: 8px; padding: 14px 18px;
+               margin-bottom: 14px; }
+  .nhan-muc { font-weight: 600; margin-bottom: 6px; }
+  .nut-mo { cursor: pointer; color: #2980b9; }
+  .noi-dung-an { display: none; margin-top: 8px; }
+</style>
+
+{% if trong_ky_thi %}
+  <p>{{ _('Bạn đang làm bài trong kỳ thi. Gợi ý chỉ xem được khi luyện tập ngoài kỳ thi.') }}</p>
+{% elif not co_goi_y %}
+  <p>{{ _('Bài này chưa có gợi ý.') }}</p>
+{% else %}
+  <p>{{ _('Thử tự làm trước. Chỉ mở gợi ý khi đã bí.') }}</p>
+
+  {% if muc1 %}
+  <div class="hop-goi-y">
+    <div class="nhan-muc">{{ _('Mức 1 — Hướng tiếp cận') }}</div>
+    <span class="nut-mo" onclick="this.nextElementSibling.style.display='block'; this.style.display='none';">
+      {{ _('Mở gợi ý') }}
+    </span>
+    <div class="noi-dung-an">{{ muc1 }}</div>
+  </div>
+  {% endif %}
+
+  {% if muc2 %}
+  <div class="hop-goi-y">
+    <div class="nhan-muc">{{ _('Mức 2 — Thuật toán') }}</div>
+    <span class="nut-mo" onclick="this.nextElementSibling.style.display='block'; this.style.display='none';">
+      {{ _('Mở gợi ý') }}
+    </span>
+    <div class="noi-dung-an">{{ muc2 }}</div>
+  </div>
+  {% endif %}
+{% endif %}
+
+<p><a href="{{ url('problem_detail', bai.code) }}">&larr; {{ _('Quay lại bài') }}</a></p>
+{% endblock %}
