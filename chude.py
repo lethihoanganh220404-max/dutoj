@@ -13,6 +13,7 @@ UI = {
         "all": "Tất cả", "part": "Phần", "topics_count": "chủ đề", "topic": "Chủ đề",
         "problems": "bài tập", "go": "Học ngay →", "search": "Tìm kiếm bài học...",
         "empty": "Không tìm thấy chủ đề phù hợp.",
+        "sap_co": "Sắp có",
     },
     "en": {
         "page_title": "Programming practice roadmap",
@@ -22,6 +23,7 @@ UI = {
         "all": "All", "part": "Part", "topics_count": "topics", "topic": "Topic",
         "problems": "problems", "go": "Start →", "search": "Search topics...",
         "empty": "No matching topics found.",
+        "sap_co": "Coming soon",
     },
 }
 
@@ -65,6 +67,22 @@ TOPIC_EN = {
 }
 
 
+# Ma chu de trong STAGES o tren -> ten ProblemType that trong database.
+# Chu de khong co trong bang nay la chua co bai, se hien "sap co".
+MA_SANG_DB = {
+    "coban": "introductory",
+    "sohoc": "math",
+    "xau": "strings",
+    "sapxep": "sorting-searching",
+    "ctdl": "data-structures",
+    "tohop": "combinatorics",
+    "thamlam": "greedy",
+    "quaylui": "brute-force",
+    "qhd": "dynamic-programming",
+    "dothi": "graph-theory",
+}
+
+
 def get_lang(request):
     code = (getattr(request, "LANGUAGE_CODE", "") or "vi").lower()
     return "en" if code.startswith("en") else "vi"
@@ -76,10 +94,16 @@ def build_stages(types, by_type, solved, lang="vi"):
         short, name = names[lang]
         cards = []
         for code, desc in topics:
-            t = types.get(code)
-            if t is None:
-                continue
+            t = types.get(MA_SANG_DB.get(code, code))
             num += 1
+            if t is None:
+                # Chua co bai cho chu de nay
+                cards.append({
+                    "num": num, "name": TOPIC_EN.get(code, code),
+                    "desc": desc[lang], "count": 0, "done": 0, "pct": 0,
+                    "url": "", "sap_co": True,
+                })
+                continue
             ids = by_type.get(t.id, set())
             done = len(ids & solved)
             cards.append({
@@ -87,6 +111,7 @@ def build_stages(types, by_type, solved, lang="vi"):
                 "desc": desc[lang], "count": len(ids), "done": done,
                 "pct": round(100 * done / len(ids)) if ids else 0,
                 "url": "/problems/?type=%d" % t.id,
+                "sap_co": False,
             })
         stages.append({"key": key, "short": short, "icon": icon, "cards": cards,
                        "title": "%s %d: %s" % (UI[lang]["part"], len(stages) + 1, name)})
